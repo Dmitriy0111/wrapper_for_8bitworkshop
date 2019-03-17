@@ -1,0 +1,46 @@
+diff --git a/ice40/hvsync_generator.v b/ice40/hvsync_generator.v
+index 2458761..e793d40 100644
+--- a/ice40/hvsync_generator.v
++++ b/ice40/hvsync_generator.v
+@@ -15,8 +15,8 @@ module hvsync_generator(clk, reset, hsync, vsync, display_on, hpos, vpos);
+   input reset;
+   output reg hsync, vsync;
+   output display_on;
+-  output reg [8:0] hpos;
+-  output reg [8:0] vpos;
++  output reg [15:0] hpos;
++  output reg [15:0] vpos;
+ 
+   // declarations for TV-simulator sync parameters
+   // horizontal constants
+@@ -43,7 +43,7 @@ module hvsync_generator(clk, reset, hsync, vsync, display_on, hpos, vpos);
+   // horizontal position counter
+   always @(posedge clk)
+   begin
+-    hsync <= (hpos>=H_SYNC_START && hpos<=H_SYNC_END);
++    hsync <= ~ (hpos>=H_SYNC_START && hpos<=H_SYNC_END);
+     if(hmaxxed)
+       hpos <= 0;
+     else
+@@ -53,7 +53,7 @@ module hvsync_generator(clk, reset, hsync, vsync, display_on, hpos, vpos);
+   // vertical position counter
+   always @(posedge clk)
+   begin
+-    vsync <= (vpos>=V_SYNC_START && vpos<=V_SYNC_END);
++    vsync <= ~ (vpos>=V_SYNC_START && vpos<=V_SYNC_END);
+     if(hmaxxed)
+       if (vmaxxed)
+         vpos <= 0;
+diff --git a/ice40/test_hvsync.v b/ice40/test_hvsync.v
+index a3445ce..79558fb 100644
+--- a/ice40/test_hvsync.v
++++ b/ice40/test_hvsync.v
+@@ -16,7 +16,7 @@ module test_hvsync_top(clk, reset, hsync, vsync, rgb);
+ 
+   hvsync_generator hvsync_gen(
+     .clk(clk),
+-    .reset(0),
++    .reset(reset),
+     .hsync(hsync),
+     .vsync(vsync),
+     .display_on(display_on),
