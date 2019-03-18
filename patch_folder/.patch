@@ -1,5 +1,5 @@
 diff --git a/ice40/hvsync_generator.v b/ice40/hvsync_generator.v
-index 2458761..e793d40 100644
+index 2458761..022515a 100644
 --- a/ice40/hvsync_generator.v
 +++ b/ice40/hvsync_generator.v
 @@ -15,8 +15,8 @@ module hvsync_generator(clk, reset, hsync, vsync, display_on, hpos, vpos);
@@ -13,28 +13,359 @@ index 2458761..e793d40 100644
  
    // declarations for TV-simulator sync parameters
    // horizontal constants
-@@ -43,7 +43,7 @@ module hvsync_generator(clk, reset, hsync, vsync, display_on, hpos, vpos);
+@@ -37,28 +37,40 @@ module hvsync_generator(clk, reset, hsync, vsync, display_on, hpos, vpos);
+   parameter V_SYNC_END      = V_DISPLAY + V_BOTTOM + V_SYNC - 1;
+   parameter V_MAX           = V_DISPLAY + V_TOP + V_BOTTOM + V_SYNC - 1;
+ 
+-  wire hmaxxed = (hpos == H_MAX) || reset;	// set when hpos is maximum
+-  wire vmaxxed = (vpos == V_MAX) || reset;	// set when vpos is maximum
++  wire hmaxxed = hpos == H_MAX;	// set when hpos is maximum
++  wire vmaxxed = vpos == V_MAX;	// set when vpos is maximum
+   
    // horizontal position counter
-   always @(posedge clk)
+-  always @(posedge clk)
++  always @(posedge clk, posedge reset)
++  if( reset )
    begin
 -    hsync <= (hpos>=H_SYNC_START && hpos<=H_SYNC_END);
++    hsync <= 1'b0;
++    hpos  <= 16'b0;
++  end
++  else
++  begin
 +    hsync <= ~ (hpos>=H_SYNC_START && hpos<=H_SYNC_END);
      if(hmaxxed)
-       hpos <= 0;
+-      hpos <= 0;
++      hpos <= 16'b0;
      else
-@@ -53,7 +53,7 @@ module hvsync_generator(clk, reset, hsync, vsync, display_on, hpos, vpos);
+-      hpos <= hpos + 1;
++      hpos <= hpos + 1'b1;
+   end
+ 
    // vertical position counter
-   always @(posedge clk)
+-  always @(posedge clk)
++  always @(posedge clk, posedge reset)
++  if( reset )
++  begin
++    vsync <= 1'b0;
++    vpos  <= 16'b0;
++  end
++  else
    begin
 -    vsync <= (vpos>=V_SYNC_START && vpos<=V_SYNC_END);
 +    vsync <= ~ (vpos>=V_SYNC_START && vpos<=V_SYNC_END);
      if(hmaxxed)
        if (vmaxxed)
-         vpos <= 0;
+-        vpos <= 0;
++        vpos <= 16'b0;
+       else
+-        vpos <= vpos + 1;
++        vpos <= vpos + 1'b1;
+   end
+   
+   // display_on is set when beam is in "safe" visible frame
+diff --git a/ice40/racing_game.v b/ice40/racing_game.v
+index 7bc6fc8..0294d06 100644
+--- a/ice40/racing_game.v
++++ b/ice40/racing_game.v
+@@ -1,46 +1,37 @@
+ 
+-`include "hvsync_generator.v"
+-`include "sprite_bitmap.v"
+-`include "sprite_renderer.v"
+-
+ /*
+ A simple racing game with two sprites and a scrolling playfield.
+ This version does not use a CPU; all logic is straight Verilog.
+ */
+ 
+-module racing_game_top(clk, reset, out, hpaddle, vpaddle);
++module racing_game_top(clk, reset, left, right, hsync, vsync, rgb);
+ 
+   input clk, reset;
+-  input hpaddle, vpaddle;
+-  output [1:0] out;
+-  wire hsync, vsync;
++  input left, right;
++  output hsync, vsync;
++  output [2:0] rgb;
+   wire display_on;
+-  wire [8:0] hpos;
+-  wire [8:0] vpos;
++  wire [15:0] hpos;
++  wire [15:0] vpos;
+ 
+   // player car position (set at VSYNC)
+-  reg [7:0] player_x;
+-  reg [7:0] player_y;  
+-  // paddle position (set continuously during frame)
+-  reg [7:0] paddle_x;
+-  reg [7:0] paddle_y;
++  reg [15:0] player_x;
++  wire [15:0] player_y;  
++  assign player_y = 16'd454;
+   // enemy car position
+-  reg [7:0] enemy_x = 128;
+-  reg [7:0] enemy_y = 128;
++  reg [15:0] enemy_x;
++  reg [15:0] enemy_y;
+   // enemy car direction, 1=right, 0=left
+-  reg enemy_dir = 0;	
+-  
+-  reg [15:0] track_pos = 0;	// player position along track (16 bits)
+-  reg [7:0] speed = 31;		// player velocity along track (8 bits)
++  reg enemy_dir;	
+   
+-  reg clk2;
+-  always @(posedge clk) begin
+-    clk2 <= !clk2;
+-  end
++  reg [15:0] track_pos;	// player position along track (16 bits)
++  reg [7:0] speed;		// player velocity along track (8 bits)
+ 
+   // video sync generator
+-  hvsync_generator #(256,60,40,25) hvsync_gen(
+-    .clk(clk2),
++  hvsync_generator 
++  hvsync_gen
++  (
++    .clk(clk),
+     .reset(reset),
+     .hsync(hsync),
+     .vsync(vsync),
+@@ -49,17 +40,9 @@ module racing_game_top(clk, reset, out, hpaddle, vpaddle);
+     .vpos(vpos)
+   );
+   
+-  // set paddle registers
+-  always @(posedge hsync)
+-    begin
+-      if (!hpaddle) paddle_x <= vpos[7:0];
+-      if (!vpaddle) paddle_y <= vpos[7:0];
+-    end
+-
+-  
+   // select player or enemy access to ROM
+-  wire player_load = (hpos >= 256) && (hpos < 260);
+-  wire enemy_load = (hpos >= 260);
++  wire player_load = (hpos >= 400-4) && (hpos < 400);
++  wire enemy_load = (hpos >= 400);
+   // wire up car sprite ROM
+   // multiplex between player and enemy ROM address
+   wire [3:0] player_sprite_yofs;
+@@ -84,7 +67,7 @@ module racing_game_top(clk, reset, out, hpaddle, vpaddle);
+   
+   // player sprite generator
+   sprite_renderer player_renderer(
+-    .clk(clk2),
++    .clk(clk),
+     .reset(reset),
+     .vstart(player_vstart),
+     .load(player_load),
+@@ -96,7 +79,7 @@ module racing_game_top(clk, reset, out, hpaddle, vpaddle);
+ 
+   // enemy sprite generator
+   sprite_renderer enemy_renderer(
+-    .clk(clk2),
++    .clk(clk),
+     .reset(reset),
+     .vstart(enemy_vstart),
+     .load(enemy_load),
+@@ -107,18 +90,61 @@ module racing_game_top(clk, reset, out, hpaddle, vpaddle);
+     .in_progress(enemy_is_drawing));
+ 
+   // signals for enemy bouncing off left/right borders  
+-  wire enemy_hit_left = (enemy_x == 64);
+-  wire enemy_hit_right = (enemy_x == 192);
++  wire enemy_hit_left  = (enemy_x == 52);     // TODO
++  wire enemy_hit_right = (enemy_x == 580);    // TODO
+   wire enemy_hit_edge = enemy_hit_left || enemy_hit_right;
++  reg frame_collision;
++  wire track_gfx;
++
++  reg frame_update;
++  reg frame_update_last;
++
++  always @(posedge clk, posedge reset)
++    if( reset )
++    begin
++      frame_update <= 1'b0;
++      frame_update_last <= 1'b0;
++    end
++    else
++    begin
++      frame_update <= 1'b0;
++      if( !vsync )
++      begin
++        frame_update <= 1'b1;
++        frame_update_last <= 1'b1;
++      end
++      else if( vsync )
++      begin
++        frame_update <= 1'b0;
++        frame_update_last <= 1'b0;
++      end
++      if( frame_update_last )
++        frame_update <= 1'b0;
++    end
+   
+   // update player, enemy, track counters
+   // runs once per frame
+-  always @(posedge vsync)
++  always @(posedge clk, posedge reset)
++    if( reset )
++    begin
++      enemy_x <= 320;
++      enemy_y <= 0;
++      player_x <= 320;
++      enemy_dir <= 0;
++      track_pos <= 0;
++      speed <= 31;
++    end
++    else if(frame_update)
+     begin
+-      player_x <= 64; //paddle_x;
+-      player_y <= 180;
++      player_x <= player_x + (left == 1'b1 ? - 1 : 0) + (right == 1'b1 ? + 1 : 0);
++      if( ( player_x < 52 ) )
++        player_x <= 52;
++      if( ( player_x > 580 ) )
++        player_x <= 580;
+       track_pos <= track_pos + {11'b0,speed[7:4]};
+       enemy_y <= enemy_y + {3'b0, speed[7:4]};
++      if(enemy_y >= 480)
++        enemy_y <= 0;
+       if (enemy_hit_edge)
+         enemy_dir <= !enemy_dir;
+       if (enemy_dir ^ enemy_hit_edge)
+@@ -128,31 +154,37 @@ module racing_game_top(clk, reset, out, hpaddle, vpaddle);
+       // collision check?
+       if (frame_collision)
+         speed <= 16;
+-      else if (speed < ~paddle_y)
++      else if (speed < 100)
+         speed <= speed + 1;
+-      else if (speed > 16)
++      else if (speed > 100)
+         speed <= speed - 1;
+     end
+   
+   // set to 1 when player collides with enemy or track
+-  reg frame_collision;
+   
+-  always @(posedge clk2)
+-    if (player_gfx && (enemy_gfx || track_gfx))
+-      frame_collision <= 1;
+-    else if (vsync)
++  always @(posedge clk, posedge reset)
++    if( reset )
++    begin
+       frame_collision <= 0;
++    end
++    else
++    begin
++      if (player_gfx && (enemy_gfx || track_gfx))
++        frame_collision <= 1;
++      else if (vsync)
++        frame_collision <= 0;
++    end
+   
+   // track graphics signals
+-  wire track_offside = (hpos[7:5]==0) || (hpos[7:5]==7);
+-  wire track_shoulder = (hpos[7:3]==3) || (hpos[7:3]==28);
+-  wire track_gfx = (vpos[5:1]!=track_pos[5:1]) && track_offside;
++  wire track_offside = (hpos<20) || (hpos>620);
++  wire track_shoulder = (hpos<40) || (hpos>600);
++  assign track_gfx = (vpos[5:1]!=track_pos[5:1]) && track_offside;
+   
+   // combine signals for RGB output
+   wire r = display_on && (enemy_gfx || track_shoulder);
+   wire g = display_on && (player_gfx || track_gfx);
+   wire b = display_on && (player_gfx || track_shoulder);
+ 
+-  assign out = (hsync||vsync) ? 0 : (1+g+(r|b));
++  assign rgb = {r,g,b};
+ 
+ endmodule
+diff --git a/ice40/sprite_bitmap.v b/ice40/sprite_bitmap.v
+index e75127a..cfbd483 100644
+--- a/ice40/sprite_bitmap.v
++++ b/ice40/sprite_bitmap.v
+@@ -1,9 +1,4 @@
+ 
+-`ifndef SPRITE_BITMAP_H
+-`define SPRITE_BITMAP_H
+-
+-`include "hvsync_generator.v"
+-
+ /*
+ Simple sprite renderer example.
+ 
+@@ -21,24 +16,22 @@ module car_bitmap(yofs, bits);
+   assign bits = bitarray[yofs];
+   
+   initial begin/*{w:8,h:16}*/
+-    bitarray[0] = 8'b0;
+-    bitarray[1] = 8'b1100;
+-    bitarray[2] = 8'b11001100;
+-    bitarray[3] = 8'b11111100;
+-    bitarray[4] = 8'b11101100;
+-    bitarray[5] = 8'b11100000;
+-    bitarray[6] = 8'b1100000;
+-    bitarray[7] = 8'b1110000;
+-    bitarray[8] = 8'b110000;
+-    bitarray[9] = 8'b110000;
+-    bitarray[10] = 8'b110000;
+-    bitarray[11] = 8'b1101110;
++    bitarray[0]  = 8'b10000000;
++    bitarray[1]  = 8'b11001100;
++    bitarray[2]  = 8'b11001100;
++    bitarray[3]  = 8'b11111110;
++    bitarray[4]  = 8'b11101100;
++    bitarray[5]  = 8'b11101100;
++    bitarray[6]  = 8'b01100000;
++    bitarray[7]  = 8'b01110000;
++    bitarray[8]  = 8'b00110000;
++    bitarray[9]  = 8'b00110000;
++    bitarray[10] = 8'b00110000;
++    bitarray[11] = 8'b01101110;
+     bitarray[12] = 8'b11101110;
+-    bitarray[13] = 8'b11111110;
++    bitarray[13] = 8'b11111111;
+     bitarray[14] = 8'b11101110;
+-    bitarray[15] = 8'b101110;
++    bitarray[15] = 8'b00101110;
+   end
+   
+ endmodule
+-
+-`endif
+diff --git a/ice40/sprite_renderer.v b/ice40/sprite_renderer.v
+index a5ea369..b776742 100644
+--- a/ice40/sprite_renderer.v
++++ b/ice40/sprite_renderer.v
+@@ -1,10 +1,4 @@
+ 
+-`ifndef SPRITE_RENDERER_H
+-`define SPRITE_RENDERER_H
+-
+-`include "hvsync_generator.v"
+-`include "sprite_bitmap.v"
+-
+ /*
+ Displays a 16x16 sprite (8 bits mirrored left/right).
+ */
 diff --git a/ice40/test_hvsync.v b/ice40/test_hvsync.v
-index a3445ce..79558fb 100644
+index a3445ce..4f553bd 100644
 --- a/ice40/test_hvsync.v
 +++ b/ice40/test_hvsync.v
+@@ -1,5 +1,5 @@
+ 
+-`include "hvsync_generator.v"
++//`include "hvsync_generator.v"
+ 
+ /*
+ A simple test pattern using the hvsync_generator module.
 @@ -16,7 +16,7 @@ module test_hvsync_top(clk, reset, hsync, vsync, rgb);
  
    hvsync_generator hvsync_gen(

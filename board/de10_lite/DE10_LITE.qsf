@@ -431,8 +431,15 @@ set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_RO
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_global_assignment -name SDC_FILE DE10_LITE.SDC
 set_global_assignment -name VERILOG_FILE DE10_LITE.v
-set_global_assignment -name VERILOG_FILE "../../../fpga-examples/ice40/hvsync_generator.v"
-set_global_assignment -name VERILOG_FILE "../../../fpga-examples/ice40/test_hvsync.v"
+set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_test_hvsync.v
+set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_racing_game.v
+set_global_assignment -name VERILOG_FILE ../../../fpga-examples/ice40/hvsync_generator.v
+set_global_assignment -name VERILOG_FILE ../../../fpga-examples/ice40/test_hvsync.v
+set_global_assignment -name VERILOG_FILE ../../../fpga-examples/ice40/racing_game.v
+set_global_assignment -name VERILOG_FILE ../../../fpga-examples/ice40/sprite_renderer.v
+set_global_assignment -name VERILOG_FILE ../../../fpga-examples/ice40/sprite_bitmap.v
+set_global_assignment -name VERILOG_FILE DE10_LITE.v
+set_global_assignment -name SDC_FILE DE10_LITE.SDC
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"

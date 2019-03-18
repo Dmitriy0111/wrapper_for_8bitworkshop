@@ -66,45 +66,32 @@ module DE10_LITE(
 //  REG/WIRE declarations
 //=======================================================
 
-    // redefine parameters horizontal sync
-    defparam test_hvsync_top_0.hvsync_gen.H_DISPLAY = 640;
-    defparam test_hvsync_top_0.hvsync_gen.H_BACK    = 48;
-    defparam test_hvsync_top_0.hvsync_gen.H_FRONT   = 16;
-    defparam test_hvsync_top_0.hvsync_gen.H_SYNC    = 96;
-    // redefine parameters vertical sync
-    defparam test_hvsync_top_0.hvsync_gen.V_DISPLAY = 480;
-    defparam test_hvsync_top_0.hvsync_gen.V_TOP     = 10;
-    defparam test_hvsync_top_0.hvsync_gen.V_BOTTOM  = 33;
-    defparam test_hvsync_top_0.hvsync_gen.V_SYNC    = 2;
-
     wire    [0 : 0]     clk;
     wire    [0 : 0]     reset; 
+    wire    [3 : 0]     keys;
     wire    [0 : 0]     hsync;
     wire    [0 : 0]     vsync; 
     wire    [2 : 0]     rgb;
-    reg     [0 : 0]     clk_div;
 
     assign reset  = ~ KEY[0];
-    assign clk    = clk_div;
+    assign clk    = MAX10_CLK1_50;
+    assign keys   = SW[0 +: 4];
     assign VGA_HS = hsync;
     assign VGA_VS = vsync;
     assign {VGA_R,VGA_G,VGA_B} = { { 4 { rgb[2] } } , { 4 { rgb[1] } } , { 4 { rgb[0] } } };
-
-    always @(posedge MAX10_CLK1_50, posedge reset)
-        if( reset )
-            clk_div <= 1'b0;
-        else
-            clk_div <= ~ clk_div;
 
 //=======================================================
 //  Structural coding
 //=======================================================
 
-    test_hvsync_top
-    test_hvsync_top_0
+`define FPGA_EXAMPLE wrapper_racing_game
+
+    `FPGA_EXAMPLE
+    `FPGA_EXAMPLE
     (
         .clk    ( clk   ), 
         .reset  ( reset ), 
+        .keys   ( keys  ),
         .hsync  ( hsync ), 
         .vsync  ( vsync ), 
         .rgb    ( rgb   )
