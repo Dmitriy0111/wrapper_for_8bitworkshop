@@ -1,4 +1,4 @@
-//`define log_en 1
+`define log_en 1
 
 module racing_game_tb ();
 
@@ -44,15 +44,15 @@ module racing_game_tb ();
     end
     initial
     begin
-        left    = 1'b1;
-        right   = 1'b0;
+        left    = 1'b0;
+        right   = 1'b1;
     end
 
     `ifdef log_en
 
     integer file;
     integer frame_c;
-    parameter repeat_cycles = 20;
+    parameter repeat_cycles = 200;
 
     string color = "";
 
