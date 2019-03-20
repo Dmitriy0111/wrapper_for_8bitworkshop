@@ -1,3 +1,200 @@
+diff --git a/ice40/digits10.v b/ice40/digits10.v
+index 60f2bf1..150d76f 100644
+--- a/ice40/digits10.v
++++ b/ice40/digits10.v
+@@ -1,8 +1,8 @@
+ 
+-`ifndef DIGITS10_H
+-`define DIGITS10_H
++//`ifndef DIGITS10_H
++//`define DIGITS10_H
+ 
+-`include "hvsync_generator.v"
++//`include "hvsync_generator.v"
+ 
+ /*
+ ROM module with 5x5 bitmaps for the digits 0-9.
+@@ -93,74 +93,86 @@ module digits10_array(digit, yofs, bits);
+   
+   input [3:0] digit;		// digit 0-9
+   input [2:0] yofs;		// vertical offset (0-4)
+-  output [4:0] bits;		// output (5 bits)
++  output reg [4:0] bits;		// output (5 bits)
+ 
+-  reg [4:0] bitarray[16][5];	// ROM array (16 x 5 x 5 bits)
++  wire [24 : 0] help_bits;
+ 
+-  assign bits = bitarray[digit][yofs];	// assign module output
+-  
+-  integer i,j;
++  reg [24:0] bitarray [9 : 0];	// ROM array (16 x 5 x 5 bits)
++
++  assign help_bits = bitarray[digit];	// assign module output
++
++  always @(*)
++  begin
++    bits = 5'b0;
++    case( yofs )
++      0: bits = help_bits[ 20 +: 5 ];
++      1: bits = help_bits[ 15 +: 5 ];
++      2: bits = help_bits[ 10 +: 5 ];
++      3: bits = help_bits[ 5  +: 5 ];
++      4: bits = help_bits[ 0  +: 5 ];
++    endcase
++  end
+   
+   initial begin/*{w:5,h:5,count:10}*/
+-    bitarray[0][0] = 5'b11111;
+-    bitarray[0][1] = 5'b10001;
+-    bitarray[0][2] = 5'b10001;
+-    bitarray[0][3] = 5'b10001;
+-    bitarray[0][4] = 5'b11111;
+-
+-    bitarray[1][0] = 5'b01100;
+-    bitarray[1][1] = 5'b00100;
+-    bitarray[1][2] = 5'b00100;
+-    bitarray[1][3] = 5'b00100;
+-    bitarray[1][4] = 5'b11111;
+-
+-    bitarray[2][0] = 5'b11111;
+-    bitarray[2][1] = 5'b00001;
+-    bitarray[2][2] = 5'b11111;
+-    bitarray[2][3] = 5'b10000;
+-    bitarray[2][4] = 5'b11111;
+-
+-    bitarray[3][0] = 5'b11111;
+-    bitarray[3][1] = 5'b00001;
+-    bitarray[3][2] = 5'b11111;
+-    bitarray[3][3] = 5'b00001;
+-    bitarray[3][4] = 5'b11111;
+-
+-    bitarray[4][0] = 5'b10001;
+-    bitarray[4][1] = 5'b10001;
+-    bitarray[4][2] = 5'b11111;
+-    bitarray[4][3] = 5'b00001;
+-    bitarray[4][4] = 5'b00001;
+-
+-    bitarray[5][0] = 5'b11111;
+-    bitarray[5][1] = 5'b10000;
+-    bitarray[5][2] = 5'b11111;
+-    bitarray[5][3] = 5'b00001;
+-    bitarray[5][4] = 5'b11111;
+-
+-    bitarray[6][0] = 5'b11111;
+-    bitarray[6][1] = 5'b10000;
+-    bitarray[6][2] = 5'b11111;
+-    bitarray[6][3] = 5'b10001;
+-    bitarray[6][4] = 5'b11111;
+-
+-    bitarray[7][0] = 5'b11111;
+-    bitarray[7][1] = 5'b00001;
+-    bitarray[7][2] = 5'b00001;
+-    bitarray[7][3] = 5'b00001;
+-    bitarray[7][4] = 5'b00001;
+-
+-    bitarray[8][0] = 5'b11111;
+-    bitarray[8][1] = 5'b10001;
+-    bitarray[8][2] = 5'b11111;
+-    bitarray[8][3] = 5'b10001;
+-    bitarray[8][4] = 5'b11111;
+-
+-    bitarray[9][0] = 5'b11111;
+-    bitarray[9][1] = 5'b10001;
+-    bitarray[9][2] = 5'b11111;
+-    bitarray[9][3] = 5'b00001;
+-    bitarray[9][4] = 5'b11111;
++    bitarray[0] = { 5'b11111 ,
++                    5'b10001 ,
++                    5'b10001 ,
++                    5'b10001 ,
++                    5'b11111 };
++                    
++    bitarray[1] = { 5'b01100 ,
++                    5'b00100 ,
++                    5'b00100 ,
++                    5'b00100 ,
++                    5'b11111 };
++    
++    bitarray[2] = { 5'b11111 ,
++                    5'b00001 ,
++                    5'b11111 ,
++                    5'b10000 ,
++                    5'b11111 };
++
++    bitarray[3] = { 5'b11111 ,
++                    5'b00001 ,
++                    5'b11111 ,
++                    5'b00001 ,
++                    5'b11111 };
++
++    bitarray[4] = { 5'b10001 ,
++                    5'b10001 ,
++                    5'b11111 ,
++                    5'b00001 ,
++                    5'b00001 };
++
++    bitarray[5] = { 5'b11111 ,
++                    5'b10000 ,
++                    5'b11111 ,
++                    5'b00001 ,
++                    5'b11111 };
++
++    bitarray[6] = { 5'b11111 ,
++                    5'b10000 ,
++                    5'b11111 ,
++                    5'b10001 ,
++                    5'b11111 };
++
++    bitarray[7] = { 5'b11111 ,
++                    5'b00001 ,
++                    5'b00001 ,
++                    5'b00001 ,
++                    5'b00001 };
++
++    bitarray[8] = { 5'b11111 ,
++                    5'b10001 ,
++                    5'b11111 ,
++                    5'b10001 ,
++                    5'b11111 };
++    
++    bitarray[9] = { 5'b11111 ,
++                    5'b10001 ,
++                    5'b11111 ,
++                    5'b00001 ,
++                    5'b11111 };
+ 
+   end
+ endmodule
+@@ -173,8 +185,8 @@ module test_numbers_top(clk, reset, hsync, vsync, rgb);
+   output [2:0] rgb;
+ 
+   wire display_on;
+-  wire [8:0] hpos;
+-  wire [8:0] vpos;
++  wire [15:0] hpos;
++  wire [15:0] vpos;
+   
+   hvsync_generator hvsync_gen(
+     .clk(clk),
+@@ -186,9 +198,9 @@ module test_numbers_top(clk, reset, hsync, vsync, rgb);
+     .vpos(vpos)
+   );
+   
+-  wire [3:0] digit = hpos[7:4];
+-  wire [2:0] xofs = hpos[3:1];
+-  wire [2:0] yofs = vpos[3:1];
++  wire [3:0] digit = hpos[9 -: 4];
++  wire [2:0] xofs  = hpos[5 -: 3];
++  wire [2:0] yofs  = vpos[3 -: 3];
+   wire [4:0] bits;
+   
+   digits10_array numbers(
+@@ -204,4 +216,4 @@ module test_numbers_top(clk, reset, hsync, vsync, rgb);
+ 
+ endmodule
+ 
+-`endif
++//`endif
 diff --git a/ice40/hvsync_generator.v b/ice40/hvsync_generator.v
 index 2458761..022515a 100644
 --- a/ice40/hvsync_generator.v
