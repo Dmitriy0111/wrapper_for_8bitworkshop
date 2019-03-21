@@ -47,6 +47,8 @@ module racing_game_tb ();
         left    = 1'b0;
         right   = 1'b1;
     end
+    initial
+        $readmemb("../fpga-examples/car.hex",wrapper_racing_game_0.racing_game_top_0.car.bitarray);
 
     `ifdef log_en
 

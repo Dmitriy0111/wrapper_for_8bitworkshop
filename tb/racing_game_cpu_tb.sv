@@ -1,6 +1,6 @@
 `define log_en 1
 
-module digits10_tb ();
+module racing_game_cpu_tb ();
 
     timeprecision       1ns;
     timeunit            1ns;
@@ -13,10 +13,14 @@ module digits10_tb ();
     logic   [0 : 0]     hsync;
     logic   [0 : 0]     vsync; 
     logic   [2 : 0]     rgb;
+    logic   [0 : 0]     left;
+    logic   [0 : 0]     right;
     logic   [3 : 0]     keys;
 
-    wrapper_digit10
-    wrapper_digit10_0
+    assign keys = '0 | {right,left};
+
+    wrapper_racing_game_cpu
+    wrapper_racing_game_cpu_0
     (
         .clk        ( clk       ), 
         .reset      ( reset     ), 
@@ -38,6 +42,16 @@ module digits10_tb ();
         repeat(rst_delay) @(posedge clk);
         reset = '0;
     end
+    initial
+    begin
+        left    = 1'b0;
+        right   = 1'b1;
+    end
+    initial
+    begin
+        $readmemb("../fpga-examples/car.hex",wrapper_racing_game_cpu_0.racing_game_cpu_top_0.car.bitarray);
+        $readmemh("../fpga-examples/racing.hex",wrapper_racing_game_cpu_0.racing_game_cpu_top_0.rom);
+    end
 
     `ifdef log_en
 
@@ -46,8 +60,7 @@ module digits10_tb ();
     parameter repeat_cycles = 200;
 
     string color = "";
-    initial
-        $readmemb("../fpga-examples/digits10.hex",wrapper_digit10_0.test_numbers_top_0.numbers.bitarray);
+
     initial
     begin
         frame_c = 0;
@@ -96,4 +109,4 @@ module digits10_tb ();
 
     `endif
 
-endmodule : digits10_tb
+endmodule : racing_game_cpu_tb

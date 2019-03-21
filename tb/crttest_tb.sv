@@ -1,6 +1,6 @@
 `define log_en 1
 
-module digits10_tb ();
+module crttest_tb ();
 
     timeprecision       1ns;
     timeunit            1ns;
@@ -15,8 +15,8 @@ module digits10_tb ();
     logic   [2 : 0]     rgb;
     logic   [3 : 0]     keys;
 
-    wrapper_digit10
-    wrapper_digit10_0
+    wrapper_crttest
+    wrapper_crttest_0
     (
         .clk        ( clk       ), 
         .reset      ( reset     ), 
@@ -46,8 +46,7 @@ module digits10_tb ();
     parameter repeat_cycles = 200;
 
     string color = "";
-    initial
-        $readmemb("../fpga-examples/digits10.hex",wrapper_digit10_0.test_numbers_top_0.numbers.bitarray);
+
     initial
     begin
         frame_c = 0;
@@ -59,12 +58,12 @@ module digits10_tb ();
                 begin
                     color = ( rgb == 0 ) && ( color == "" ) ? " " : color;
                     color = ( rgb == 1 ) && ( color == "" ) ? "1" : color;
-                    color = ( rgb == 2 ) && ( color == "" ) ? "$" : color;
-                    color = ( rgb == 3 ) && ( color == "" ) ? "T" : color;
-                    color = ( rgb == 4 ) && ( color == "" ) ? "#" : color;
-                    color = ( rgb == 5 ) && ( color == "" ) ? "H" : color;
+                    color = ( rgb == 2 ) && ( color == "" ) ? "2" : color;
+                    color = ( rgb == 3 ) && ( color == "" ) ? "3" : color;
+                    color = ( rgb == 4 ) && ( color == "" ) ? "4" : color;
+                    color = ( rgb == 5 ) && ( color == "" ) ? "5" : color;
                     color = ( rgb == 6 ) && ( color == "" ) ? "6" : color;
-                    color = ( rgb == 7 ) && ( color == "" ) ? "*" : color;
+                    color = ( rgb == 7 ) && ( color == "" ) ? "7" : color;
                     
                     $fwrite(file, "%s", color);
 
@@ -96,4 +95,4 @@ module digits10_tb ();
 
     `endif
 
-endmodule : digits10_tb
+endmodule : crttest_tb

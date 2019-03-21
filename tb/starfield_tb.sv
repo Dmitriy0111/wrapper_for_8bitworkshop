@@ -58,12 +58,12 @@ module starfield_tb ();
                 begin
                     color = ( rgb == 0 ) && ( color == "" ) ? " " : color;
                     color = ( rgb == 1 ) && ( color == "" ) ? "1" : color;
-                    color = ( rgb == 2 ) && ( color == "" ) ? "$" : color;
-                    color = ( rgb == 3 ) && ( color == "" ) ? "T" : color;
-                    color = ( rgb == 4 ) && ( color == "" ) ? "#" : color;
-                    color = ( rgb == 5 ) && ( color == "" ) ? "H" : color;
+                    color = ( rgb == 2 ) && ( color == "" ) ? "2" : color;
+                    color = ( rgb == 3 ) && ( color == "" ) ? "3" : color;
+                    color = ( rgb == 4 ) && ( color == "" ) ? "4" : color;
+                    color = ( rgb == 5 ) && ( color == "" ) ? "5" : color;
                     color = ( rgb == 6 ) && ( color == "" ) ? "6" : color;
-                    color = ( rgb == 7 ) && ( color == "" ) ? "*" : color;
+                    color = ( rgb == 7 ) && ( color == "" ) ? "7" : color;
                     
                     $fwrite(file, "%s", color);
 
