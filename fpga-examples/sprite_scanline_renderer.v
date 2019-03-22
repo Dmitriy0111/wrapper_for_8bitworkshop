@@ -1,41 +1,32 @@
 
-`include "hvsync_generator.v"
-`include "ram.v"
-
-/*
-sprite_scanline_renderer - Module that renders multiple
-  sprites whose attributes are fetched from shared RAM,
-  and whose bitmaps are stored in ROM. Made to be paired
-  with the FEMTO-16 CPU.
-*/
-
-module example_bitmap_rom(addr, data);
+module example_bitmap_rom
+(
+    input   wire    [15 : 0]    addr, 
+    output  wire    [15 : 0]    data
+);
   
-  input [15:0] addr;
-  output [15:0] data;
-  
-  reg [15:0] bitarray[0:255];
-  
-  assign data = bitarray[addr & 15];
-  
-  initial begin/*{w:16,h:16,bpw:16,count:1}*/
-    bitarray['h00] = 16'b0000011110000000;
-    bitarray['h01] = 16'b0000100001000000;
-    bitarray['h02] = 16'b0001111111100000;
-    bitarray['h03] = 16'b0001111111100000;
-    bitarray['h04] = 16'b0000011110000000;
-    bitarray['h05] = 16'b0011111111110000;
-    bitarray['h06] = 16'b0111100001111000;
-    bitarray['h07] = 16'b1111101101111100;
-    bitarray['h08] = 16'b1101100001101111;
-    bitarray['h09] = 16'b1101111111100110;
-    bitarray['h0a] = 16'b1001111111100000;
-    bitarray['h0b] = 16'b0001111111100000;
-    bitarray['h0c] = 16'b0001110011100000;
-    bitarray['h0d] = 16'b0001100001100000;
-    bitarray['h0e] = 16'b0001100001100000;
-    bitarray['h0f] = 16'b0011100001110000;
-  end
+    reg     [15:0]      bitarray [0 : 255];
+    
+    assign data = bitarray[addr & 15];
+    
+    initial begin/*{w:16,h:16,bpw:16,count:1}*/
+        bitarray['h00] = 16'b0000011110000000;
+        bitarray['h01] = 16'b0000100001000000;
+        bitarray['h02] = 16'b0001111111100000;
+        bitarray['h03] = 16'b0001111111100000;
+        bitarray['h04] = 16'b0000011110000000;
+        bitarray['h05] = 16'b0011111111110000;
+        bitarray['h06] = 16'b0111100001111000;
+        bitarray['h07] = 16'b1111101101111100;
+        bitarray['h08] = 16'b1101100001101111;
+        bitarray['h09] = 16'b1101111111100110;
+        bitarray['h0a] = 16'b1001111111100000;
+        bitarray['h0b] = 16'b0001111111100000;
+        bitarray['h0c] = 16'b0001110011100000;
+        bitarray['h0d] = 16'b0001100001100000;
+        bitarray['h0e] = 16'b0001100001100000;
+        bitarray['h0f] = 16'b0011100001110000;
+    end
 
 endmodule
 

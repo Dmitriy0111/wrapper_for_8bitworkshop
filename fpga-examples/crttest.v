@@ -3,7 +3,7 @@ module crttest
 (
     input   wire    [0 : 0]     clk,    // clock
     input   wire    [0 : 0]     reset,  // reset
-    output  wire    [0 : 0]     hsync,  // hozintal sync
+    output  wire    [0 : 0]     hsync,  // horizontal sync
     output  wire    [0 : 0]     vsync,  // vertical sync
     output  wire    [2 : 0]     rgb     // RGB VGA
 );

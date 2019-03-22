@@ -7,18 +7,24 @@ module starfield_top
     output  wire    [0 : 0]     vsync,  // vertical sync
     output  wire    [2 : 0]     rgb     // RGB VGA
 );
-
+    /*******************************************************
+    *               WIRE AND REG DECLARATION               *
+    *******************************************************/
     wire    [0  : 0]    display_on;
     wire    [0  : 0]    star_on;
     wire    [0  : 0]    star_enable;
     wire    [15 : 0]    hpos;
     wire    [15 : 0]    vpos;
     wire    [15 : 0]    lfsr;
-    
+    /*******************************************************
+    *                      ASSIGNMENT                      *
+    *******************************************************/    
     assign  star_enable = ( ! hpos[15] ) && ( ! vpos[15] );
-    assign  star_on     = & lfsr[15:9]; // all 7 bits must be set
-    assign  rgb         = display_on && star_on ? lfsr[2:0] : 0;
-    
+    assign  star_on     = & lfsr[15 : 9]; // all 7 bits must be set
+    assign  rgb         = display_on && star_on ? lfsr[2 : 0] : 3'b000;
+    /*******************************************************
+    *                   MODULE INSTANCES                   *
+    *******************************************************/    
     // creating one hvsync generator
     hvsync_generator
     hvsync_gen
@@ -34,16 +40,16 @@ module starfield_top
     // creating one lfsr_gen
     LFSR
     #(
-      .NBITS        ( 32            ),
-      .TAPS         ( 8'b11101      ),
-      .INVERT       ( 0             )
+        .NBITS      ( 32            ),
+        .TAPS       ( 8'b11101      ),
+        .INVERT     ( 0             )
     )
     lfsr_gen
     (
-      .clk          ( clk           ),
-      .reset        ( reset         ),
-      .enable       ( star_enable   ),
-      .lfsr         ( lfsr          )
+        .clk        ( clk           ),
+        .reset      ( reset         ),
+        .enable     ( star_enable   ),
+        .lfsr       ( lfsr          )
     );
 
 endmodule // starfield_top

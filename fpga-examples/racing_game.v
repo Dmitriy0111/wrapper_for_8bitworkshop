@@ -81,7 +81,7 @@ module racing_game_top
     // creating track's
     assign track_offside   = ( hpos < 20 ) || ( hpos > 620 );
     assign track_shoulder  = ( hpos < 40 ) || ( hpos > 600 );
-    assign track_gfx       = track_offside; // TODO
+    assign track_gfx       = track_shoulder; // TODO
     // form RGB signal
     assign  rgb =   {
                         display_on && ( enemy_gfx  || track_shoulder ),
@@ -112,8 +112,8 @@ module racing_game_top
     always @(posedge clk, posedge reset)
         if( reset )
         begin
-            enemy_x <= 320;
-            enemy_y <= 0;
+            enemy_x   <= 320;
+            enemy_y   <= 0;
             enemy_dir <= 0;
         end
         else if( frame_update )
@@ -122,7 +122,7 @@ module racing_game_top
             if( enemy_y >= 480 )
                 enemy_y <= 0;
             if( enemy_hit_edge )
-                enemy_dir <= !enemy_dir;
+                enemy_dir <= ~ enemy_dir;
             if( enemy_dir ^ enemy_hit_edge )
                 enemy_x <= enemy_x + 4;
             else
@@ -158,7 +158,7 @@ module racing_game_top
         if( reset )
             track_pos <= 0;
         else if( frame_update )
-            track_pos <= track_pos + {11'b0,speed[7:4]};
+            track_pos <= track_pos + speed[7 : 4];
     // collision if player collides with enemy or track
     always @(posedge clk, posedge reset)
         if( reset )

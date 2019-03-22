@@ -1,15 +1,17 @@
 
 module racing_game_cpu_top
 (
-    input   wire    [0 : 0]     clk, 
-    input   wire    [0 : 0]     reset, 
-    input   wire    [0 : 0]     hpaddle, 
-    input   wire    [0 : 0]     vpaddle,
-    output  wire    [2 : 0]     rgb, 
-    output  wire    [0 : 0]     hsync, 
-    output  wire    [0 : 0]     vsync
+    input   wire    [0 : 0]     clk,        // clock
+    input   wire    [0 : 0]     reset,      // reset
+    output  wire    [0 : 0]     hsync,      // horizontal sync
+    output  wire    [0 : 0]     vsync,      // vertical sync
+    output  wire    [2 : 0]     rgb,        // RGB
+    input   wire    [0 : 0]     hpaddle,    
+    input   wire    [0 : 0]     vpaddle     
 );
-
+    /*******************************************************
+    *                 PARAMS & LOCALPARAMS                 *
+    *******************************************************/
     localparam  PADDLE_X = 0;       // paddle X coordinate
     localparam  PADDLE_Y = 1;       // paddle Y coordinate
     localparam  PLAYER_X = 2;       // player X coordinate

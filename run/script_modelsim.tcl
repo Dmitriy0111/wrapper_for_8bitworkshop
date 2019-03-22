@@ -3,10 +3,12 @@ vlib work
 
 #set test "test_hvsync_tb"
 #set test "racing_game_tb"
-set test "racing_game_cpu_tb"
+#set test "racing_game_cpu_tb"
+#set test "spritetest_tb"
 #set test "digits10_tb"
 #set test "starfield_tb"
 #set test "crttest_tb"
+set test "tiletest_tb"
 
 if {$test == "test_hvsync_tb"} {
 
@@ -113,7 +115,48 @@ if {$test == "test_hvsync_tb"} {
     add wave -position insertpoint sim:/crttest_tb/*
     add wave -position insertpoint sim:/crttest_tb/wrapper_crttest_0/crttest_0/*
 
+} elseif {$test == "spritetest_tb"} {
+
+    set i0 +incdir+../fpga-examples
+    set i1 +incdir+../rtl
+    set i2 +incdir+../tb
+
+    set s0 ../fpga-examples/hvsync_generator.v
+    set s1 ../fpga-examples/spritetest.v
+    set s2 ../fpga-examples/sprite_bitmap.v
+    set s3 ../fpga-examples/sprite_renderer.v
+    set s4 ../rtl/wrapper_spritetest.v
+    set s5 ../tb/spritetest_tb.*v
+
+    vlog $i0 $i1 $i2 $s0 $s1 $s2 $s3 $s4 $s5
+
+    vsim -novopt work.spritetest_tb
+    add wave -position insertpoint sim:/spritetest_tb/*
+    add wave -position insertpoint sim:/spritetest_tb/wrapper_spritetest_0/spritetest_0/*
+
+} elseif {$test == "tiletest_tb"} {
+
+    set i0 +incdir+../fpga-examples
+    set i1 +incdir+../rtl
+    set i2 +incdir+../tb
+
+    set s0 ../fpga-examples/hvsync_generator.v
+    set s1 ../fpga-examples/ram.v
+    set s2 ../fpga-examples/tile_renderer.v
+    set s3 ../fpga-examples/font_cp437_8x8.v
+    set s4 ../fpga-examples/tiletest.v
+    set s5 ../rtl/wrapper_tiletest.v
+    set s6 ../tb/tiletest_tb.*v
+
+    vlog $i0 $i1 $i2 $s0 $s1 $s2 $s3 $s4 $s5 $s6
+
+    vsim -novopt work.tiletest_tb
+    add wave -position insertpoint sim:/tiletest_tb/*
+    add wave -position insertpoint sim:/tiletest_tb/wrapper_tiletest_0/test_tilerender_top_0/*
+
 }
+
+
 
 run -all
 
