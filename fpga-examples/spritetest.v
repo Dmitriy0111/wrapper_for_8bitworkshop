@@ -77,14 +77,14 @@ module spritetest
         begin
             // finding new player x position
             player_x <= player_x + ( left ? - 3'h4 : 1'b0 ) + ( right ? + 3'h4 : 1'b0 );
-            if( player_x < 20 )
-                player_x <= 20;
+            if( player_x < 4 )
+                player_x <= 4;
             if( player_x > 620 )
                 player_x <= 620;
             // finding new player y position
             player_y <= player_y + ( down ? - 3'h4 : 1'b0 ) + ( up    ? + 3'h4 : 1'b0 );
-            if( player_y < 20 )
-                player_y <= 20;
+            if( player_y < 4 )
+                player_y <= 4;
             if( player_y > 460 )
                 player_y <= 460;
         end

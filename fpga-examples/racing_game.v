@@ -81,10 +81,10 @@ module racing_game_top
     // creating track's
     assign track_offside   = ( hpos < 20 ) || ( hpos > 620 );
     assign track_shoulder  = ( hpos < 40 ) || ( hpos > 600 );
-    assign track_gfx       = track_shoulder; // TODO
+    assign track_gfx       = ( vpos [5 : 1] != track_pos[5 : 1] ) && track_offside;
     // form RGB signal
     assign  rgb =   {
-                        display_on && ( enemy_gfx  || track_shoulder ),
+                        display_on && ( enemy_gfx                    ),
                         display_on && ( player_gfx || track_gfx      ),
                         display_on && ( player_gfx || track_shoulder )
                     };

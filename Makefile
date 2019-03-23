@@ -13,9 +13,6 @@ help:
 	$(info make synth_gui_q    	- open the board project with quartus)
 	$(info make synth_load_q   	- program the default FPGA board with quartus)
 	$(info make board_all      	- run synthesis for all the supported boards)
-	$(info make load_8bit      	- load FPGA examples for 8bitworkshop.com from github and apply patch )
-	$(info make c_patch_8bit	- create patch file)
-	$(info make a_patch_8bit	- apply patch file)
 	$(info Open and read the Makefile for details)
 	@true
 
@@ -122,26 +119,4 @@ board_all: $(BOARDS_SUPPORTED)
 
 board_clean:
 	rm -rfd $(PWD)/synth_*
-
-########################################################
-# load FPGA examples for 8bitworkshop.com from github
-
-load_8bit:
-	git clone https://github.com/sehugg/fpga-examples
-	cp -rf fpga-examples ../
-	rm -rf fpga-examples
-	cp -rf patch_folder/.patch ../fpga-examples/.patch 
-	cp -rf help_make/Makefile ../fpga-examples/Makefile
-	make -C $(FPGA_EXAMPLES) a_patch_8bit
-
-########################################################
-# work with git diff and apply
-
-FPGA_EXAMPLES	= ../fpga-examples
-# create patch file
-c_patch_8bit:
-	make -C $(FPGA_EXAMPLES) c_patch_8bit
-	cp -rf ../fpga-examples/.patch patch_folder/.patch
-# apply patch file
-a_patch_8bit:
-	make -C $(FPGA_EXAMPLES) a_patch_8bit
+	

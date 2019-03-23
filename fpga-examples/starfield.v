@@ -40,7 +40,7 @@ module starfield_top
     // creating one lfsr_gen
     LFSR
     #(
-        .NBITS      ( 32            ),
+        .NBITS      ( 2048          ),
         .TAPS       ( 8'b11101      ),
         .INVERT     ( 0             )
     )
