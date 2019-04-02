@@ -68,11 +68,11 @@ module digits10_case
             7'o103: bits = 5'b10001;
             7'o104: bits = 5'b11111;
             // 9
-            7'o110: bits = 5'b11111;
-            7'o111: bits = 5'b10001;
-            7'o112: bits = 5'b11111;
-            7'o113: bits = 5'b00001;
-            7'o114: bits = 5'b11111;
+            7'o110: bits = 5'b01110;
+            7'o111: bits = 5'b01010;
+            7'o112: bits = 5'b01110;
+            7'o113: bits = 5'b00010;
+            7'o114: bits = 5'b01110;
             // default
             default: bits = 0;
         endcase
@@ -90,7 +90,7 @@ module digits10_array
 
     reg     [24 : 0]    bitarray [9 : 0];   // ROM array (16 x 5 x 5 bits)
 
-    assign help_bits = bitarray[ digit ];
+    assign help_bits = digit <= 9 ? bitarray[ digit ] : 0;
 
     always @(*)
     begin

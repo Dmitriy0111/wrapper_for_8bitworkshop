@@ -77,25 +77,6 @@ tttt = flags test for conditional branch
 `define     DEST_B      2'b01
 `define     DEST_IP     2'b10
 `define     DEST_NOP    2'b11
-  
-// instruction macros
-`define     I_COMPUTE(dest,op)          { 2'b00, (dest), (op) }
-`define     I_COMPUTE_IMM(dest,op)      { 2'b01, (dest), (op) }
-`define     I_COMPUTE_READB(dest,op)    { 2'b11, (dest), (op) }
-`define     I_CONST_IMM_A               { 2'b01, `DEST_A, `OP_LOAD_B }
-`define     I_CONST_IMM_B               { 2'b01, `DEST_B, `OP_LOAD_B }
-`define     I_JUMP_IMM                  { 2'b01, `DEST_IP, `OP_LOAD_B }
-`define     I_STORE_A(addr)             { 4'b1001, (addr) }
-`define     I_BRANCH_IF(zv,zu,cv,cu)    { 4'b1010, (zv), (zu), (cv), (cu) }
-`define     I_CLEAR_CARRY               { 8'b10001000 }
-`define     I_SWAP_AB                   { 8'b10000001 }
-`define     I_RESET                     { 8'b10111111 }
-// convenience macros
-`define     I_ZERO_A                    `I_COMPUTE(`DEST_A, `OP_ZERO)
-`define     I_ZERO_B                    `I_COMPUTE(`DEST_B, `OP_ZERO)
-`define     I_BRANCH_IF_CARRY(carry)    `I_BRANCH_IF(1'b0, 1'b0, carry, 1'b1)
-`define     I_BRANCH_IF_ZERO(zero)      `I_BRANCH_IF(zero, 1'b1, 1'b0, 1'b0)
-`define     I_CLEAR_ZERO                `I_COMPUTE(`DEST_NOP, `OP_ZERO)
 
 module CPU
 (
@@ -148,6 +129,8 @@ module CPU
             A        <= 0;
             B        <= 0;
             data_out <= 0;
+            carry    <= 0;
+            zero     <= 0;
         end 
         else 
         begin
@@ -161,6 +144,8 @@ module CPU
                     A        <= 0;
                     B        <= 0;
                     data_out <= 0;
+                    carry    <= 0;
+                    zero     <= 0;
                 end
                 // state 1: select opcode address
                 S_SELECT: 
@@ -174,7 +159,7 @@ module CPU
                 S_DECODE: 
                 begin
                     opcode <= data_in; // (only use opcode next cycle)
-                    case( data_in )
+                    casex( data_in )
                         // ALU A + B -> dest
                         8'b00??????: 
                         begin

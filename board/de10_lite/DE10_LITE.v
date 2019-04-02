@@ -84,7 +84,7 @@ module DE10_LITE(
 //  Structural coding
 //=======================================================
 
-`define FPGA_EXAMPLE wrapper_racing_game
+`define FPGA_EXAMPLE wrapper_racing_game_cpu
 
     `FPGA_EXAMPLE
     `FPGA_EXAMPLE

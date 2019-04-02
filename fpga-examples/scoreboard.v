@@ -43,9 +43,9 @@ module scoreboard_generator
     );
 
     reg     [3 : 0]     score_digit;
-    reg     [4 : 0]     score_bits;
-    
-    assign board_gfx = score_bits[ hpos[4 : 2] ^ 3'b111 ];
+    wire    [4 : 0]     score_bits;
+
+    assign board_gfx = (hpos[4 -: 3] ^ 3'b111) < 8 ? score_bits[ hpos[4 -: 3] ^ 3'b111 ] : 0;
 
     always @(*)
         case( hpos[7 : 5] )
@@ -54,15 +54,15 @@ module scoreboard_generator
             6       : score_digit = lives;
             default : score_digit = 15; // no digit
         endcase
-    
+
     digits10_array 
     digits
     (
         .digit      ( score_digit   ),
-        .yofs       ( vpos[4 : 2]   ),
+        .yofs       ( vpos[3 -: 3]  ),
         .bits       ( score_bits    )
     );
-  
+
 endmodule
 
 module scoreboard_top

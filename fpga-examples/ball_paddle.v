@@ -38,14 +38,13 @@ module ball_paddle_top
     wire    [3  : 0]    score1;         // score left digit
     wire    [3  : 0]    lives;          // # lives remaining
     reg     [0  : 0]    incscore;       // incscore signal 
-    reg     [0  : 0]    declives;       // declive 
+    wire    [0  : 0]    declives;       // declive 
     wire    [0  : 0]    score_gfx;      // output from score generator
     // horizontal and vertical cells
     wire    [5  : 0]    hcell;          // horizontal brick index
     wire    [5  : 0]    vcell;          // vertical brick index
     wire    [0  : 0]    lr_border;      // along horizontal border?
     // TODO: unsigned compare doesn't work in JS
-    wire    [8  : 0]    paddle_rel_x;
     reg     [0  : 0]    main_gfx;       // main graphics signal (bricks and borders)
     reg     [0  : 0]    brick_present;  // 1 when we are drawing a brick
     reg     [6  : 0]    brick_index;    // index into array of current brick
@@ -165,6 +164,7 @@ module ball_paddle_top
     always @(posedge clk, posedge reset)
         if( reset )
             incscore <= 0;
+        else
         begin
             if( ball_pixel_collide && brick_present ) 
             begin
@@ -183,6 +183,7 @@ module ball_paddle_top
             begin
                 ball_dir_y <= BALL_DIR_DOWN;
                 ball_dir_x <= BALL_DIR_RIGHT;
+                ball_speed_x <= 0;
             end 
             else
             // ball collided with paddle?
@@ -226,8 +227,8 @@ module ball_paddle_top
         if( reset ) 
         begin
             // reset ball position to top center
-            ball_x <= 128;
-            ball_y <= 180;
+            ball_x <= 320;
+            ball_y <= 240;
         end 
         else 
         begin
@@ -241,18 +242,18 @@ module ball_paddle_top
     // compute main_gfx
     always @(*)
         case( vpos[8 : 3] )
-            0,1,2                   : main_gfx = score_gfx; // scoreboard
+            0,1,2                   : main_gfx = score_gfx;                 // scoreboard
             3                       : main_gfx = 0;
-            4                       : main_gfx = 1; // top border
-            8,9,10,11,12,13,14,15   : main_gfx = brick_gfx; // brick rows 1-8
-            28                      : main_gfx = paddle_gfx | lr_border; // paddle
-            29                      : main_gfx = hpos[0] ^ vpos[0]; // bottom border
-            default                 : main_gfx = lr_border; // left/right borders
+            4                       : main_gfx = 1;                         // top border
+            8,9,10,11,12,13,14,15   : main_gfx = brick_gfx;                 // brick rows 1-8
+            28                      : main_gfx = paddle_gfx | lr_border;    // paddle
+            29                      : main_gfx = hpos[0] ^ vpos[0];         // bottom border
+            default                 : main_gfx = lr_border;                 // left/right borders
         endcase
     /*******************************************************
     *                   MODULE INSTANCES                   *
     *******************************************************/
-
+    // creating one hvsync generator
     hvsync_generator 
     hvsync_gen
     (
@@ -264,8 +265,7 @@ module ball_paddle_top
         .hpos       ( hpos          ),
         .vpos       ( vpos          )
     );
-    
-    // scoreboard
+    // creating one player stats
     player_stats 
     stats
     (
@@ -276,7 +276,7 @@ module ball_paddle_top
         .lives      ( lives         ),
         .declives   ( declives      )
     );
-
+    // creating one scoreboard generator
     scoreboard_generator 
     score_gen
     (
@@ -288,5 +288,4 @@ module ball_paddle_top
       .board_gfx    ( score_gfx     )
     );
 
-endmodule
-
+endmodule // ball_paddle_top

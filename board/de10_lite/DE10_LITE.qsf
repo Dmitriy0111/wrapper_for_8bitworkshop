@@ -435,6 +435,7 @@ set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_spritetest.v
 set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_crttest.v
 set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_test_hvsync.v
 set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_racing_game.v
+set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_racing_game_cpu.v
 set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_digit10.v
 set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_starfield.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/spritetest.v
@@ -447,6 +448,8 @@ set_global_assignment -name VERILOG_FILE ../../fpga-examples/digits10.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/starfield.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/lfsr.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/crttest.v
+set_global_assignment -name VERILOG_FILE ../../fpga-examples/cpu8.v
+set_global_assignment -name VERILOG_FILE ../../fpga-examples/racing_game_cpu.v
 set_global_assignment -name VERILOG_FILE DE10_LITE.v
 set_global_assignment -name SDC_FILE DE10_LITE.SDC
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0

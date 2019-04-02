@@ -3,12 +3,13 @@ vlib work
 
 #set test "test_hvsync_tb"
 #set test "racing_game_tb"
-#set test "racing_game_cpu_tb"
+set test "racing_game_cpu_tb"
 #set test "spritetest_tb"
 #set test "digits10_tb"
 #set test "starfield_tb"
 #set test "crttest_tb"
-set test "tiletest_tb"
+#set test "tiletest_tb"
+#set test "ball_paddle_tb"
 
 if {$test == "test_hvsync_tb"} {
 
@@ -61,6 +62,8 @@ if {$test == "test_hvsync_tb"} {
 
     vsim -novopt work.racing_game_cpu_tb
     add wave -position insertpoint sim:/racing_game_cpu_tb/*
+    add wave -position insertpoint sim:/racing_game_cpu_tb/wrapper_racing_game_cpu_0/racing_game_cpu_top_0/*
+    add wave -position insertpoint sim:/racing_game_cpu_tb/wrapper_racing_game_cpu_0/racing_game_cpu_top_0/cpu/*
 
 } elseif {$test == "digits10_tb"} {
 
@@ -154,9 +157,28 @@ if {$test == "test_hvsync_tb"} {
     add wave -position insertpoint sim:/tiletest_tb/*
     add wave -position insertpoint sim:/tiletest_tb/wrapper_tiletest_0/test_tilerender_top_0/*
 
+} elseif {$test == "ball_paddle_tb"} {
+
+    set i0 +incdir+../fpga-examples
+    set i1 +incdir+../rtl
+    set i2 +incdir+../tb
+
+    set s0 ../fpga-examples/hvsync_generator.v
+    set s1 ../fpga-examples/digits10.v
+    set s2 ../fpga-examples/scoreboard.v
+    set s3 ../fpga-examples/ball_paddle.v
+    set s4 ../rtl/wrapper_ball_paddle.v
+    set s5 ../tb/ball_paddle_tb.*v
+
+    vlog $i0 $i1 $i2 $s0 $s1 $s2 $s3 $s4 $s5
+
+    vsim -novopt work.ball_paddle_tb
+    add wave -position insertpoint sim:/ball_paddle_tb/*
+    add wave -position insertpoint sim:/ball_paddle_tb/wrapper_ball_paddle_0/ball_paddle_top_0/*
+    add wave -position insertpoint sim:/ball_paddle_tb/wrapper_ball_paddle_0/ball_paddle_top_0/score_gen/*
+    add wave -position insertpoint sim:/ball_paddle_tb/wrapper_ball_paddle_0/ball_paddle_top_0/score_gen/digits/*
+
 }
-
-
 
 run -all
 

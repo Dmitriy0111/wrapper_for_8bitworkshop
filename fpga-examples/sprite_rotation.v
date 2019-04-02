@@ -5,12 +5,12 @@ module tank_bitmap
     output  wire    [7 : 0]     bits
 );
   
-  reg [15:0] bitarray[0:255];
-  
-  assign bits = (addr[0]) ? bitarray[addr>>1][15:8] : bitarray[addr>>1][7:0];
-  
-  initial
-    $readmemb("tank.hex", bitarray)
+    reg     [15 : 0]    bitarray [0 : 255];
+    
+    assign bits = (addr[0]) ? bitarray[addr>>1][15:8] : bitarray[addr>>1][7:0];
+    
+    initial
+        $readmemb("tank.hex", bitarray)
 
 endmodule // tank_bitmap
 
@@ -28,16 +28,15 @@ module sprite_renderer2
     output  wire    [0 : 0]     busy
 );
 
-  localparam WAIT_FOR_VSTART = 0;
-  localparam WAIT_FOR_LOAD   = 1;
-  localparam LOAD1_SETUP     = 2;
-  localparam LOAD1_FETCH     = 3;
-  localparam LOAD2_SETUP     = 4;
-  localparam LOAD2_FETCH     = 5;
-  localparam WAIT_FOR_HSTART = 6;
-  localparam DRAW            = 7;
+    localparam WAIT_FOR_VSTART = 0;
+    localparam WAIT_FOR_LOAD   = 1;
+    localparam LOAD1_SETUP     = 2;
+    localparam LOAD1_FETCH     = 3;
+    localparam LOAD2_SETUP     = 4;
+    localparam LOAD2_FETCH     = 5;
+    localparam WAIT_FOR_HSTART = 6;
+    localparam DRAW            = 7;
   
-
     reg     [2  : 0]    state;
     reg     [3  : 0]    ycount;
     reg     [3  : 0]    xcount;
@@ -194,38 +193,37 @@ module tank_controller
     wire    [0  : 0]    vstart = {1'b0,player_y} == vpos;
     wire    [0  : 0]    hstart = {1'b0,player_x} == hpos;
 
-    sprite_renderer2 
-    renderer
-    (
-        .clk        ( clk                   ),
-        .vstart     ( vstart                ),
-        .load       ( hsync                 ),
-        .hstart     ( hstart                ),
-        .hmirror    ( hmirror               ),
-        .vmirror    ( vmirror               ),
-        .rom_addr   ( sprite_addr[4 : 0]    ),
-        .rom_bits   ( sprite_bits           ),
-        .gfx        ( gfx                   ),
-        .busy       ( busy                  )
-    );
-    
-    rotation_selector 
-    rotsel
-    (
-        .rotation   (player_rot         ),
-        .bitmap_num (sprite_addr[7 : 5] ),
-        .hmirror    (hmirror            ),
-        .vmirror    (vmirror            )
-    );
+    // set if collision; cleared at vsync
+    reg     [0  : 0]    collision_detected; 
+    reg     [0  : 0]    frame_update;
+    reg     [0  : 0]    frame_update_last;
 
-    always @(posedge vsync, posedge reset)
+    // setting frame update
+    always @(posedge clk, posedge reset)
+        if( reset )
+        begin
+            frame_update <= 1'b0;
+            frame_update_last <= 1'b0;
+        end
+        else
+        begin
+            frame_update <= 1'b0;
+            if( ! vsync )
+                frame_update_last <= 1'b1;
+            else
+                frame_update_last <= 1'b0;
+            if( ( ! vsync ) && ( ! frame_update_last ) )
+                frame_update <= 1'b1;
+        end
+
+    always @(posedge clk, posedge reset)
     begin
         if( reset ) 
         begin
             player_rot <= initial_rot;
             player_speed <= 0;
         end 
-        else 
+        else if( frame_update )
         begin
             frame <= frame + 1; // increment frame counter
             if( frame[0] ) 
@@ -245,34 +243,15 @@ module tank_controller
         end
     end
     
-    // set if collision; cleared at vsync
-    reg collision_detected; 
-    
-    always @(posedge clk)
-        if( vstart )
+    always @(posedge clk, posedge reset)
+        if( reset )
+            collision_detected <= 0;
+        else if( vstart )
             collision_detected <= 0;
         else if( collision_gfx )
             collision_detected <= 1;
     
-    // sine lookup (4 bits input, 4 signed bits output)  
-    function signed [3:0] sin_16x4;
-        input [3:0] in;	// input angle 0..15
-        integer y;
-        case (in[1:0])	// 4 values per quadrant
-            0: y = 0;
-            1: y = 3;
-            2: y = 5;
-            3: y = 6;
-        endcase
-        case (in[3:2])	// 4 quadrants
-            0: sin_16x4 = 4'(y);
-            1: sin_16x4 = 4'(7-y);
-            2: sin_16x4 = 4'(-y);
-            3: sin_16x4 = 4'(y-7);
-        endcase
-    endfunction
-    
-    always @(posedge hsync or posedge reset)
+    always @(posedge hsync, posedge reset)
         if( reset ) 
         begin
             // set initial position
@@ -296,5 +275,47 @@ module tank_controller
                     player_y_fixed <= player_y_fixed - 12'(sin_16x4(player_rot+4));
             end
         end
+
+    // sine lookup (4 bits input, 4 signed bits output)  
+    function signed [3:0] sin_16x4;
+        input [3:0] in;	// input angle 0..15
+        integer y;
+        case (in[1:0])	// 4 values per quadrant
+            0: y = 0;
+            1: y = 3;
+            2: y = 5;
+            3: y = 6;
+        endcase
+        case (in[3:2])	// 4 quadrants
+            0: sin_16x4 = 4'(y);
+            1: sin_16x4 = 4'(7-y);
+            2: sin_16x4 = 4'(-y);
+            3: sin_16x4 = 4'(y-7);
+        endcase
+    endfunction
+
+    sprite_renderer2 
+    renderer
+    (
+        .clk        ( clk                   ),
+        .vstart     ( vstart                ),
+        .load       ( hsync                 ),
+        .hstart     ( hstart                ),
+        .hmirror    ( hmirror               ),
+        .vmirror    ( vmirror               ),
+        .rom_addr   ( sprite_addr[4 : 0]    ),
+        .rom_bits   ( sprite_bits           ),
+        .gfx        ( gfx                   ),
+        .busy       ( busy                  )
+    );
+    
+    rotation_selector 
+    rotsel
+    (
+        .rotation   (player_rot         ),
+        .bitmap_num (sprite_addr[7 : 5] ),
+        .hmirror    (hmirror            ),
+        .vmirror    (vmirror            )
+    );
 
 endmodule // tank_controller

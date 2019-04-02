@@ -5,7 +5,7 @@ module font_cp437_8x8
     output  wire    [7  : 0]    data
 );
 
-    reg [7 : 0] bitarray [0 : 2047];
+    reg     [7 : 0]     bitarray [0 : 2047];
 
     assign data = bitarray[addr];
 

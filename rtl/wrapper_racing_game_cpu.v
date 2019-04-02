@@ -37,8 +37,8 @@ module wrapper_racing_game_cpu
     (
         .clk        ( clk_div   ), 
         .reset      ( reset     ), 
-        .hpaddle    ( 0         ),
-        .vpaddle    ( 0         ),
+        .left       ( left      ),
+        .right      ( right     ),
         .hsync      ( hsync     ), 
         .vsync      ( vsync     ), 
         .rgb        ( rgb       )
