@@ -7,7 +7,9 @@ module test_tilerender_top
     output  wire    [0 : 0]     vsync, 
     output  wire    [2 : 0]     rgb
 );
-
+    /*******************************************************
+    *               WIRE AND REG DECLARATION               *
+    *******************************************************/
     wire    [0  : 0]    display_on;
     wire    [15 : 0]    hpos;
     wire    [15 : 0]    vpos;
@@ -18,6 +20,9 @@ module test_tilerender_top
     wire    [10 : 0]    rom_addr;
     wire    [7  : 0]    rom_data;
     wire    [0  : 0]    ram_busy;
+    /*******************************************************
+    *                   MODULE INSTANCES                   *
+    *******************************************************/
     // creating one hvsync_generator
     hvsync_generator
     hvsync_gen

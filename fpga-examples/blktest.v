@@ -57,7 +57,7 @@ module test_ram2_top(
   wire [2:0] yofs = vpos[2:0];
   wire [7:0] bits; // TODO?
   
-  digits10_case numbers(
+  digits10_array numbers(
     .digit(digit),
     .yofs(yofs),
     .bits(bits)

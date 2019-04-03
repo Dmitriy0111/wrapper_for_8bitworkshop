@@ -11,6 +11,9 @@ module sprite_renderer
     output  reg     [0 : 0]     gfx,        // output pixel
     output  wire    [0 : 0]     in_progress // 0 if waiting for vstart
 );
+    /*******************************************************
+    *                 PARAMS & LOCALPARAMS                 *
+    *******************************************************/
     // states for state machine
     localparam      WAIT_FOR_VSTART = 0,
                     WAIT_FOR_LOAD   = 1,
@@ -18,15 +21,21 @@ module sprite_renderer
                     LOAD1_FETCH     = 3,
                     WAIT_FOR_HSTART = 4,
                     DRAW            = 5;
-    
+    /*******************************************************
+    *               WIRE AND REG DECLARATION               *
+    *******************************************************/
     reg     [2 : 0]     state;	    // current state #
     reg     [3 : 0]     ycount;	    // number of scanlines drawn so far
     reg     [3 : 0]     xcount;	    // number of horiz. pixels in this line
     reg     [7 : 0]     outbits;	// register to store bits from ROM
-    
+    /*******************************************************
+    *                      ASSIGNMENT                      *
+    *******************************************************/
     // assign in_progress output bit
     assign in_progress = state != WAIT_FOR_VSTART;
-
+    /*******************************************************
+    *               OTHER COMB AND SEQ LOGIC               *
+    *******************************************************/
     always @(posedge clk, posedge reset)
         if( reset ) 
         begin

@@ -1,14 +1,14 @@
 
 module hvsync_generator
 #(
-    parameter                   H_DISPLAY = 256,    // horizontal display width
-                                H_BACK    =  23,    // horizontal left border (back porch)
-                                H_FRONT   =   7,    // horizontal right border (front porch)
-                                H_SYNC    =  23,    // horizontal sync width
-                                V_DISPLAY = 240,    // vertical display height
-                                V_TOP     =   5,    // vertical top border
-                                V_BOTTOM  =  14,    // vertical bottom border
-                                V_SYNC    =   3     // vertical sync # lines
+    parameter                   H_DISPLAY = 640,    // horizontal display width
+                                H_BACK    =  48,    // horizontal left border (back porch)
+                                H_FRONT   =  16,    // horizontal right border (front porch)
+                                H_SYNC    =  96,    // horizontal sync width
+                                V_DISPLAY = 480,    // vertical display height
+                                V_TOP     =  10,    // vertical top border
+                                V_BOTTOM  =  33,    // vertical bottom border
+                                V_SYNC    =   2     // vertical sync # lines
 )(
     input   wire    [0  : 0]    clk,                // clock
     input   wire    [0  : 0]    reset,              // reset
@@ -18,8 +18,9 @@ module hvsync_generator
     output  reg     [15 : 0]    hpos,               // horizontal pixel position
     output  reg     [15 : 0]    vpos                // vertical pixel position
 );
-
-    // derived constants
+    /*******************************************************
+    *                 PARAMS & LOCALPARAMS                 *
+    *******************************************************/
     localparam  H_SYNC_START = H_DISPLAY + H_FRONT,
                 H_SYNC_END   = H_DISPLAY + H_FRONT + H_SYNC - 1,
                 H_MAX        = H_DISPLAY + H_BACK + H_FRONT + H_SYNC - 1,

@@ -3,13 +3,15 @@ vlib work
 
 #set test "test_hvsync_tb"
 #set test "racing_game_tb"
-set test "racing_game_cpu_tb"
+#set test "racing_game_cpu_tb"
 #set test "spritetest_tb"
 #set test "digits10_tb"
 #set test "starfield_tb"
 #set test "crttest_tb"
 #set test "tiletest_tb"
 #set test "ball_paddle_tb"
+set test "sprite_rotation_tb"
+#set test "sprite_scanline_renderer_tb"
 
 if {$test == "test_hvsync_tb"} {
 
@@ -178,6 +180,42 @@ if {$test == "test_hvsync_tb"} {
     add wave -position insertpoint sim:/ball_paddle_tb/wrapper_ball_paddle_0/ball_paddle_top_0/score_gen/*
     add wave -position insertpoint sim:/ball_paddle_tb/wrapper_ball_paddle_0/ball_paddle_top_0/score_gen/digits/*
 
+} elseif {$test == "sprite_rotation_tb"} {
+
+    set i0 +incdir+../fpga-examples
+    set i1 +incdir+../rtl
+    set i2 +incdir+../tb
+
+    set s0 ../fpga-examples/hvsync_generator.v
+    set s1 ../fpga-examples/sprite_rotation.v
+    set s2 ../rtl/wrapper_sprite_rotation.v
+    set s3 ../tb/sprite_rotation_tb.*v
+
+    vlog $i0 $i1 $i2 $s0 $s1 $s2 $s3
+
+    vsim -novopt work.sprite_rotation_tb
+    add wave -position insertpoint sim:/sprite_rotation_tb/*
+    add wave -position insertpoint sim:/sprite_rotation_tb/wrapper_sprite_rotation_0/tank_top_0/tank_controller_0/*
+    add wave -position insertpoint sim:/sprite_rotation_tb/wrapper_sprite_rotation_0/tank_top_0/tank_controller_0/renderer/*
+    
+} elseif {$test == "sprite_scanline_renderer_tb"} {
+
+    set i0 +incdir+../fpga-examples
+    set i1 +incdir+../rtl
+    set i2 +incdir+../tb
+
+    set s0 ../fpga-examples/hvsync_generator.v
+    set s1 ../fpga-examples/sprite_scanline_renderer.v
+    set s2 ../rtl/wrapper_sprite_scanline_renderer.v
+    set s3 ../tb/sprite_scanline_renderer_tb.*v
+
+    vlog $i0 $i1 $i2 $s0 $s1 $s2 $s3
+
+    vsim -novopt work.sprite_scanline_renderer_tb
+    add wave -position insertpoint sim:/sprite_scanline_renderer_tb/*
+    add wave -position insertpoint sim:/sprite_scanline_renderer_tb/wrapper_sprite_scanline_renderer_0/sprite_scanline_renderer_top_0/*
+    add wave -position insertpoint sim:/sprite_scanline_renderer_tb/wrapper_sprite_scanline_renderer_0/sprite_scanline_renderer_top_0/sprite_scanline_renderer_0/*
+    
 }
 
 run -all

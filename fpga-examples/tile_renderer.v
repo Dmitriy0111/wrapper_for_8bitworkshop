@@ -12,15 +12,18 @@ module tile_renderer
     output  wire    [10 : 0]    rom_addr, 
     input   wire    [7  : 0]    rom_data
 );
-  
+    /*******************************************************
+    *                 PARAMS & LOCALPARAMS                 *
+    *******************************************************/
     // start loading cells from RAM at this hpos value
     // first column read will be ((HLOAD-2) % 32)
     parameter HLOAD = 272;
-    
+    /*******************************************************
+    *               WIRE AND REG DECLARATION               *
+    *******************************************************/
     wire    [7  : 0]    page_base;	// page table base (8 bits)
     reg     [15 : 0]    row_base;   // row table base (16 bits)
-    reg     [4  : 0]    row;
-    //wire [4:0] row = vpos[7:3];	// 5-bit row, vpos / 8
+    reg     [4  : 0]    row;        // 5-bit row, vpos / 8
     wire    [4  : 0]    col;	    // 5-bit column, hpos / 8
     wire    [2  : 0]    yofs;       // scanline of cell (0-7)
     wire    [2  : 0]    xofs;       // which pixel to draw (0-7)
@@ -30,7 +33,9 @@ module tile_renderer
     wire    [7  : 0]    cur_attr;
 
     reg     [15 : 0]    row_buffer [0 : 31];
-
+    /*******************************************************
+    *                      ASSIGNMENT                      *
+    *******************************************************/
     // tile ROM address
     assign page_base = 8'h7e;
     assign col       = hpos[7 : 3];
@@ -40,7 +45,9 @@ module tile_renderer
     assign cur_attr  = cur_cell[15 : 8];
     assign rom_addr  = {cur_char, yofs};
     assign rgb       = rom_data[ ~ xofs ] ? cur_attr[0 +: 3] : cur_attr[4 +: 3];
-    
+    /*******************************************************
+    *               OTHER COMB AND SEQ LOGIC               *
+    *******************************************************/
     // lookup char and attr
     always @(posedge clk, posedge reset) 
         if( reset )

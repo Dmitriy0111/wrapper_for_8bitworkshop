@@ -1,4 +1,4 @@
-module wrapper_digit10
+module wrapper_sprite_scanline_renderer
 (
     input   wire    [0 : 0]     clk,
     input   wire    [0 : 0]     reset,
@@ -9,8 +9,6 @@ module wrapper_digit10
 );
 
     reg     [0 : 0]     clk_div;
-    wire    [0 : 0]     left;
-    wire    [0 : 0]     right;
 
     assign left  = keys[0];
     assign right = keys[1];
@@ -21,8 +19,8 @@ module wrapper_digit10
         else
             clk_div <= ~ clk_div;
 
-    test_numbers_top
-    test_numbers_top_0
+    sprite_scanline_renderer_top
+    sprite_scanline_renderer_top_0
     (
         .clk        ( clk_div   ), 
         .reset      ( reset     ), 
@@ -31,4 +29,4 @@ module wrapper_digit10
         .rgb        ( rgb       )
     );
 
-endmodule
+endmodule // wrapper_sprite_scanline_renderer

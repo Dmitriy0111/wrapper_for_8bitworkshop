@@ -7,17 +7,23 @@ module test_hvsync_top
     output  wire    [0 : 0]     vsync,  // vertical sync
     output  wire    [2 : 0]     rgb     // RGB
 );
-
+    /*******************************************************
+    *               WIRE AND REG DECLARATION               *
+    *******************************************************/
     wire    [0  : 0]    display_on;
     wire    [15 : 0]    hpos;
     wire    [15 : 0]    vpos;
-
+    /*******************************************************
+    *                      ASSIGNMENT                      *
+    *******************************************************/
     assign  rgb =   {  
                         display_on && ( ( ( hpos & 7 ) == 0 ) || ( ( vpos & 7 ) == 0 ) ),
                         display_on && vpos[4], 
                         display_on && hpos[4]
                     };
-
+    /*******************************************************
+    *                   MODULE INSTANCES                   *
+    *******************************************************/
     hvsync_generator 
     hvsync_gen
     (

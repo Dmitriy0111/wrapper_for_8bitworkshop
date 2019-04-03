@@ -265,6 +265,6 @@ module racing_game_cpu_top
     
     // CPU program code
     initial
-        $readmemh("racing.hex", rom);
+        $readmemh("../../fpga-examples/racing.hex", rom);
   
 endmodule // racing_game_cpu_top

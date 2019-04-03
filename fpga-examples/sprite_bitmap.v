@@ -14,6 +14,6 @@ module car_bitmap
     assign bits = bitarray[yofs];
 
     initial 
-        $readmemb("car.hex",bitarray);
+        $readmemb("../../fpga-examples/car.hex",bitarray);
 
 endmodule // car_bitmap

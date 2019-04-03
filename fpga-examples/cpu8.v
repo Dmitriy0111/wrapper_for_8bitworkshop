@@ -28,7 +28,9 @@ module ALU
     input   wire    [3   : 0]   aluop,  // alu operation
     output  reg     [N   : 0]   Y       // Y output + carry
 );
-  
+    /*******************************************************
+    *               OTHER COMB AND SEQ LOGIC               *
+    *******************************************************/
     always @(*)
         case( aluop )
             // unary operations
@@ -87,7 +89,9 @@ module CPU
     output  reg     [7 : 0]     data_out, 
     output  reg     [0 : 0]     write
 );
-
+    /*******************************************************
+    *                 PARAMS & LOCALPARAMS                 *
+    *******************************************************/
     localparam S_RESET   = 0;
     localparam S_SELECT  = 1;
     localparam S_DECODE  = 2;

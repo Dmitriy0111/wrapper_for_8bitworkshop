@@ -8,7 +8,9 @@ module player_stats
     input   wire    [0 : 0]     incscore, 
     input   wire    [0 : 0]     declives
 );
-
+    /*******************************************************
+    *               OTHER COMB AND SEQ LOGIC               *
+    *******************************************************/
     always @(posedge incscore, posedge reset)
             if( reset ) 
             begin
@@ -21,7 +23,6 @@ module player_stats
                 score1 <= score1 + 1;
             end else 
                 score0 <= score0 + 1;
-
     always @(posedge declives, posedge reset)
         begin
             if( reset )
@@ -41,12 +42,18 @@ module scoreboard_generator
         input   wire    [15 : 0]    hpos, 
         output  wire    [0  : 0]    board_gfx
     );
-
+    /*******************************************************
+    *               WIRE AND REG DECLARATION               *
+    *******************************************************/
     reg     [3 : 0]     score_digit;
     wire    [4 : 0]     score_bits;
-
+    /*******************************************************
+    *                      ASSIGNMENT                      *
+    *******************************************************/
     assign board_gfx = (hpos[4 -: 3] ^ 3'b111) < 8 ? score_bits[ hpos[4 -: 3] ^ 3'b111 ] : 0;
-
+    /*******************************************************
+    *               OTHER COMB AND SEQ LOGIC               *
+    *******************************************************/
     always @(*)
         case( hpos[7 : 5] )
             1       : score_digit = score1;
@@ -54,7 +61,9 @@ module scoreboard_generator
             6       : score_digit = lives;
             default : score_digit = 15; // no digit
         endcase
-
+    /*******************************************************
+    *                   MODULE INSTANCES                   *
+    *******************************************************/
     digits10_array 
     digits
     (
@@ -73,14 +82,21 @@ module scoreboard_top
     output  wire    [0 : 0]     vsync, 
     output  wire    [2 : 0]     rgb
 );
-
+    /*******************************************************
+    *               WIRE AND REG DECLARATION               *
+    *******************************************************/
     wire    [0  : 0]    display_on;
     wire    [15 : 0]    hpos;
     wire    [15 : 0]    vpos;    
     wire    [0  : 0]    board_gfx;
-
+    /*******************************************************
+    *                      ASSIGNMENT                      *
+    *******************************************************/
     assign rgb = { 3 { display_on && board_gfx } };
-
+    /*******************************************************
+    *                   MODULE INSTANCES                   *
+    *******************************************************/
+    // creating one hvsync generator
     hvsync_generator 
     hvsync_gen
     (
@@ -92,7 +108,7 @@ module scoreboard_top
         .hpos       ( hpos          ),
         .vpos       ( vpos          )
     );
-    
+    // creating one scoreboard generator
     scoreboard_generator 
     scoreboard_gen
     (

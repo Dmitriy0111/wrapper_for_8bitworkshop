@@ -10,9 +10,17 @@ module LFSR
     input   wire    [0       : 0]   enable,             // enable
     output  reg     [NBITS-1 : 0]   lfsr                // lfsr
 );
-
-    wire feedback = lfsr[NBITS-1] ^ INVERT;
-    
+    /*******************************************************
+    *               WIRE AND REG DECLARATION               *
+    *******************************************************/
+    wire    [0 : 0]     feedback;
+    /*******************************************************
+    *                      ASSIGNMENT                      *
+    *******************************************************/
+    assign feedback = lfsr[NBITS-1] ^ INVERT;
+    /*******************************************************
+    *               OTHER COMB AND SEQ LOGIC               *
+    *******************************************************/
     always @(posedge clk, posedge reset)
     begin
         if( reset )

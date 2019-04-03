@@ -24,6 +24,8 @@ module ball_paddle_top
     /*******************************************************
     *               WIRE AND REG DECLARATION               *
     *******************************************************/
+    reg     [0  : 0]    frame_update;
+    reg     [0  : 0]    frame_update_last;
     wire    [0  : 0]    display_on;
     wire    [15 : 0]    hpos;
     wire    [15 : 0]    vpos;
@@ -93,7 +95,24 @@ module ball_paddle_top
     /*******************************************************
     *               OTHER COMB AND SEQ LOGIC               *
     *******************************************************/
-        // scan bricks: compute brick_index and brick_present flag
+    // setting frame update
+    always @(posedge clk, posedge reset)
+        if( reset )
+        begin
+            frame_update <= 1'b0;
+            frame_update_last <= 1'b0;
+        end
+        else
+        begin
+            frame_update <= 1'b0;
+            if( ! vsync )
+                frame_update_last <= 1'b1;
+            else
+                frame_update_last <= 1'b0;
+            if( ( ! vsync ) && ( ! frame_update_last ) )
+                frame_update <= 1'b1;
+        end
+    // scan bricks: compute brick_index and brick_present flag
     always @(posedge clk, posedge reset)
         if( reset )
         begin
@@ -177,15 +196,15 @@ module ball_paddle_top
             end
         end
     // ball bounce: determine new velocity/direction
-    always @(posedge vsync, posedge reset)
+    always @(posedge clk, posedge reset)
+        if( reset ) 
         begin
-            if( reset ) 
-            begin
-                ball_dir_y <= BALL_DIR_DOWN;
-                ball_dir_x <= BALL_DIR_RIGHT;
-                ball_speed_x <= 0;
-            end 
-            else
+            ball_dir_y <= BALL_DIR_DOWN;
+            ball_dir_x <= BALL_DIR_RIGHT;
+            ball_speed_x <= 0;
+        end 
+        else if( frame_update )
+        begin
             // ball collided with paddle?
             if (ball_collide_paddle) 
             begin 
@@ -223,14 +242,14 @@ module ball_paddle_top
             end
         end
     // ball motion: update ball position
-    always @(negedge vsync, posedge reset)
-        if( reset ) 
+    always @(posedge clk, posedge reset)
+        if( reset )
         begin
             // reset ball position to top center
             ball_x <= 320;
             ball_y <= 240;
         end 
-        else 
+        else if( frame_update )
         begin
             // move ball horizontal and vertical position
             if( ball_dir_x == BALL_DIR_RIGHT )
