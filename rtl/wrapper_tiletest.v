@@ -26,4 +26,4 @@ module wrapper_tiletest
         .rgb        ( rgb       )
     );
 
-endmodule // wrapper_crttest
+endmodule // wrapper_tiletest

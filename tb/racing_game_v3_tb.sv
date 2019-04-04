@@ -1,6 +1,6 @@
 `define log_en 1
 
-module sprite_rotation_tb ();
+module racing_game_v3_tb ();
 
     timeprecision       1ns;
     timeunit            1ns;
@@ -15,13 +15,12 @@ module sprite_rotation_tb ();
     logic   [2 : 0]     rgb;
     logic   [0 : 0]     left;
     logic   [0 : 0]     right;
-    logic   [0 : 0]     up;
     logic   [3 : 0]     keys;
 
-    assign keys = '0 | {up,right,left};
+    assign keys = '0 | {right,left};
 
-    wrapper_sprite_rotation
-    wrapper_sprite_rotation_0
+    wrapper_racing_game_v3
+    wrapper_racing_game_v3_0
     (
         .clk        ( clk       ), 
         .reset      ( reset     ), 
@@ -45,12 +44,11 @@ module sprite_rotation_tb ();
     end
     initial
     begin
-        left    = '0;
-        right   = '0;
-        up      = '1;
+        left    = 1'b0;
+        right   = 1'b1;
     end
     initial
-        $readmemb("../fpga-examples/tank.hex",wrapper_sprite_rotation_0.tank_top_0.tank_0.bitarray);
+        $readmemb("../fpga-examples/car.hex",wrapper_racing_game_v3_0.racing_game_top_v3_0.car.bitarray);
 
     `ifdef log_en
 
@@ -108,4 +106,4 @@ module sprite_rotation_tb ();
 
     `endif
 
-endmodule : sprite_rotation_tb
+endmodule : racing_game_v3_tb

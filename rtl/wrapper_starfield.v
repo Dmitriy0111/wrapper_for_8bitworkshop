@@ -26,4 +26,4 @@ module wrapper_starfield
         .rgb        ( rgb       )
     );
 
-endmodule
+endmodule // wrapper_starfield

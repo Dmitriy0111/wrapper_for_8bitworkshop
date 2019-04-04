@@ -26,4 +26,4 @@ module wrapper_test_hvsync
         .rgb    ( rgb       )
     );
 
-endmodule
+endmodule // wrapper_test_hvsync

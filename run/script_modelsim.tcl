@@ -10,7 +10,9 @@ vlib work
 #set test "crttest_tb"
 #set test "tiletest_tb"
 #set test "ball_paddle_tb"
-set test "sprite_rotation_tb"
+#set test "sprite_rotation_tb"
+#set test "racing_game_v2_tb"
+set test "racing_game_v3_tb"
 #set test "sprite_scanline_renderer_tb"
 
 if {$test == "test_hvsync_tb"} {
@@ -26,6 +28,44 @@ if {$test == "test_hvsync_tb"} {
 
     vsim -novopt work.test_hvsync_tb
     add wave -position insertpoint sim:/test_hvsync_tb/*
+
+} elseif {$test == "racing_game_v3_tb"} {
+
+    set i0 +incdir+../fpga-examples
+    set i1 +incdir+../rtl
+    set i2 +incdir+../tb
+
+    set s0 ../fpga-examples/hvsync_generator.v
+    set s1 ../fpga-examples/sprite_bitmap.v
+    set s2 ../fpga-examples/sprite_renderer.v
+    set s3 ../fpga-examples/racing_game_v3.v
+    set s4 ../rtl/wrapper_racing_game_v3.v
+    set s5 ../tb/racing_game_v3_tb.*v
+
+    vlog $i0 $i1 $i2 $s0 $s1 $s2 $s3 $s4 $s5
+
+    vsim -novopt work.racing_game_v3_tb
+    add wave -position insertpoint sim:/racing_game_v3_tb/*
+    add wave -position insertpoint sim:/racing_game_v3_tb/wrapper_racing_game_v3_0/racing_game_top_v3_0/*
+
+} elseif {$test == "racing_game_v2_tb"} {
+
+    set i0 +incdir+../fpga-examples
+    set i1 +incdir+../rtl
+    set i2 +incdir+../tb
+
+    set s0 ../fpga-examples/hvsync_generator.v
+    set s1 ../fpga-examples/sprite_bitmap.v
+    set s2 ../fpga-examples/sprite_renderer.v
+    set s3 ../fpga-examples/racing_game_v2.v
+    set s4 ../rtl/wrapper_racing_game_v2.v
+    set s5 ../tb/racing_game_v2_tb.*v
+
+    vlog $i0 $i1 $i2 $s0 $s1 $s2 $s3 $s4 $s5
+
+    vsim -novopt work.racing_game_v2_tb
+    add wave -position insertpoint sim:/racing_game_v2_tb/*
+    add wave -position insertpoint sim:/racing_game_v2_tb/wrapper_racing_game_v2_0/racing_game_top_v2_0/*
 
 } elseif {$test == "racing_game_tb"} {
 

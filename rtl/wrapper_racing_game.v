@@ -33,4 +33,4 @@ module wrapper_racing_game
         .rgb        ( rgb       )
     );
 
-endmodule
+endmodule // wrapper_racing_game

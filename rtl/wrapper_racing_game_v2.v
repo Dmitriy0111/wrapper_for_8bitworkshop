@@ -1,4 +1,4 @@
-module wrapper_digit10
+module wrapper_racing_game_v2
 (
     input   wire    [0 : 0]     clk,
     input   wire    [0 : 0]     reset,
@@ -7,7 +7,7 @@ module wrapper_digit10
     output  wire    [0 : 0]     vsync,
     output  wire    [2 : 0]     rgb
 );
-
+ 
     reg     [0 : 0]     clk_div;
     wire    [0 : 0]     left;
     wire    [0 : 0]     right;
@@ -21,14 +21,16 @@ module wrapper_digit10
         else
             clk_div <= ~ clk_div;
 
-    test_numbers_top
-    test_numbers_top_0
+    racing_game_top_v2
+    racing_game_top_v2_0
     (
         .clk        ( clk_div   ), 
         .reset      ( reset     ), 
+        .left       ( left      ),
+        .right      ( right     ),
         .hsync      ( hsync     ), 
         .vsync      ( vsync     ), 
         .rgb        ( rgb       )
     );
 
-endmodule // wrapper_digit10
+endmodule // wrapper_racing_game_v2

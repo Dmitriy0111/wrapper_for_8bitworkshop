@@ -244,20 +244,20 @@ module tank_controller
     always @(posedge clk, posedge reset)
         if( reset ) 
             player_rot <= initial_rot;
-        else if( frame_update && frame[0] )
+        else if( frame_update )//( frame_update && frame[0] )
             player_rot <= player_rot + ( switch_left ? -1'b1 : 1'b0 ) + ( switch_right ? 1'b1 : 1'b0 );
     // speed and frame
-    always @(posedge clk, posedge reset)
+    /*always @(posedge clk, posedge reset)
         if( reset ) 
             frame <= 0;
         else if( frame_update )
-            frame <= frame + 1; // increment frame counter
+            frame <= frame + 1; // increment frame counter*/
     // speed and frame
     always @(posedge clk, posedge reset)
         if( reset ) 
             player_speed <= 0;
-        else if( frame_update && frame[0] )
-            player_speed <= switch_up ? ( player_speed <= 15 ? player_speed + 1 : player_speed ) : 0;
+        else if( frame_update )//( frame_update && frame[0] )
+            player_speed <= switch_up ? ( player_speed < 15 ? player_speed + 1 : player_speed ) : 0;
     // collision detection
     always @(posedge clk, posedge reset)
         if( reset )
@@ -277,26 +277,24 @@ module tank_controller
         else if( frame_update )
         begin
             // collision detected? move backwards
-            if( collision_detected && vpos[3 : 1] == 0) 
+            if( collision_detected ) 
             begin
-                if( vpos[0] )
-                    player_x <= player_x + sin_16x4( player_rot + 8  );
-                else
-                    player_y <= player_y - sin_16x4( player_rot + 12 );
+                $stop;
+                player_x <= player_x + sin_16x4( player_rot + 8  );
+                player_y <= player_y - sin_16x4( player_rot + 12 );
             end else
             // forward movement
-            if( vpos < player_speed ) 
+            if( player_speed >= 7 ) 
             begin
-                if( vpos[0] )
-                    player_x <= player_x + sin_16x4( player_rot + 0  );
-                else
-                    player_y <= player_y - sin_16x4( player_rot + 4  );
+                player_x <= player_x + sin_16x4( player_rot + 0  );
+                player_y <= player_y - sin_16x4( player_rot + 4  );
             end
         end
 
     // sine lookup (4 bits input, 4 signed bits output)  
-    function signed [3 : 0] sin_16x4( input [3 : 0] in);
-        integer y;
+    function [15 : 0] sin_16x4( input [3 : 0] in);
+        reg     [3 : 0]     y;
+        reg     [3 : 0]     out;
         begin
             case( in[1 : 0] )	// 4 values per quadrant
                 0       : y = 0;
@@ -306,12 +304,13 @@ module tank_controller
                 default : y = 0;
             endcase
             case( in[3 : 2] )	// 4 quadrants
-                0       : sin_16x4 = y;
-                1       : sin_16x4 = 7-y;
-                2       : sin_16x4 = -y;
-                3       : sin_16x4 = y-7;
-                default : sin_16x4 = y;
+                0       : out = y;
+                1       : out = 7-y;
+                2       : out = -y;
+                3       : out = y-7;
+                default : out = y;
             endcase
+            sin_16x4 = { { 12 { out[3] } } , out };
         end
     endfunction
     /*******************************************************

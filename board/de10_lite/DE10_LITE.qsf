@@ -437,6 +437,7 @@ set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_sprite_rotation.v
 set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_test_hvsync.v
 set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_racing_game.v
 set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_racing_game_cpu.v
+set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_racing_game_v3.v
 set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_digit10.v
 set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_starfield.v
 set_global_assignment -name VERILOG_FILE ../../rtl/wrapper_sprite_scanline_renderer.v
@@ -444,6 +445,7 @@ set_global_assignment -name VERILOG_FILE ../../fpga-examples/spritetest.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/hvsync_generator.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/test_hvsync.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/racing_game.v
+set_global_assignment -name VERILOG_FILE ../../fpga-examples/racing_game_v3.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/sprite_renderer.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/sprite_bitmap.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/digits10.v
