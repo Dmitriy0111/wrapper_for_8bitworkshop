@@ -248,7 +248,7 @@ module racing_game_top_v2
         .gfx            ( player_gfx            ),
         .in_progress    ( player_is_drawing     )
     );
-    // creating one enemy sprite_renderer
+    // creating one enemy sprite_renderer_1
     sprite_renderer 
     enemy_renderer_1
     (
@@ -262,7 +262,7 @@ module racing_game_top_v2
         .gfx            ( enemy_gfx_1           ),
         .in_progress    ( enemy_is_drawing_1    )
     );
-    // creating one enemy sprite_renderer
+    // creating one enemy sprite_renderer_0
     sprite_renderer 
     enemy_renderer_0
     (

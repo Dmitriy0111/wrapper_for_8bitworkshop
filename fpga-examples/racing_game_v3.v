@@ -13,75 +13,70 @@ module racing_game_top_v3
     output  wire    [2 : 0] rgb     // RGB VGA
 );
 
-    localparam  enemy_n = 4;
+    localparam  enemy_n = 7;
     /*******************************************************
     *               WIRE AND REG DECLARATION               *
     *******************************************************/
     // enemy init arrays
-    reg     [15        : 0]     enemy_y_init    [enemy_n-1 : 0];
-    reg     [15        : 0]     enemy_x_init    [enemy_n-1 : 0];
-    reg     [0         : 0]     enemy_dir_init  [enemy_n-1 : 0];
+    reg     [15          : 0]   enemy_y_init    [enemy_n-1 : 0];
+    reg     [15          : 0]   enemy_x_init    [enemy_n-1 : 0];
+    reg     [0           : 0]   enemy_dir_init  [enemy_n-1 : 0];
     // for working with vhsync generator
-    wire    [0         : 0]     display_on;         // active area
-    wire    [15        : 0]     hpos;               // horizontal position from hvsync generator
-    wire    [15        : 0]     vpos;               // vertical position from hvsync generator
+    wire    [0           : 0]   display_on;             // active area
+    wire    [15          : 0]   hpos;                   // horizontal position from hvsync generator
+    wire    [15          : 0]   vpos;                   // vertical position from hvsync generator
     // player car position
-    reg     [15        : 0]     player_x;           // player x position
-    wire    [15        : 0]     player_y;           // player y position
+    reg     [15          : 0]   player_x;               // player x position
+    wire    [15          : 0]   player_y;               // player y position
     // enemy car position
-    reg     [15        : 0]     enemy_x     [enemy_n-1 : 0];    // enemy x position
-    reg     [15        : 0]     enemy_y     [enemy_n-1 : 0];    // enemy y position
+    reg     [15          : 0]   enemy_x     [enemy_n-1 : 0];    // enemy x position
+    reg     [15          : 0]   enemy_y     [enemy_n-1 : 0];    // enemy y position
     // enemy car direction, 1=right, 0=left
-    reg     [0         : 0]     enemy_dir   [enemy_n-1 : 0];    // enemy dir (right or left)
+    reg     [0           : 0]   enemy_dir   [enemy_n-1 : 0];    // enemy dir (right or left)
     // track pos and speed values
-    reg     [15        : 0]     track_pos;          // player position along track (16 bits)
-    reg     [7         : 0]     speed;              // player velocity along track (8 bits)
+    reg     [15          : 0]   track_pos;              // player position along track (16 bits)
+    reg     [7           : 0]   speed;                  // player velocity along track (8 bits)
     // signals for player sprite generator
-    wire    [0         : 0]     player_vstart;      // 
-    wire    [0         : 0]     player_hstart;      // 
-    wire    [0         : 0]     player_gfx;         // player paint
-    wire    [0         : 0]     player_is_drawing;  // 1 if player drawing
-    wire    [0         : 0]     player_load;        // 
+    wire    [0           : 0]   player_vstart;          // 
+    wire    [0           : 0]   player_hstart;          // 
+    wire    [0           : 0]   player_gfx;             // player paint
+    wire    [0           : 0]   player_is_drawing;      // 1 if player drawing
+    wire    [0           : 0]   player_load;            // 
     // signals for enemy sprite generator
-    wire    [0         : 0]     enemy_vstart        [enemy_n-1 : 0];    // 
-    wire    [0         : 0]     enemy_hstart        [enemy_n-1 : 0];    // 
-    wire    [0         : 0]     enemy_gfx           [enemy_n-1 : 0];    // enemy paint
-    wire    [enemy_n-1 : 0]     enemy_gfx_f;                            // enemy gfx full
-    wire    [0         : 0]     enemy_is_drawing    [enemy_n-1 : 0];    // 1 if enemy drawing
-    wire    [0         : 0]     enemy_load          [enemy_n-1 : 0];    // 
+    wire    [enemy_n-1   : 0]   enemy_vstart;           // 
+    wire    [enemy_n-1   : 0]   enemy_hstart;           // 
+    wire    [enemy_n-1   : 0]   enemy_gfx;              // enemy paint
+    wire    [enemy_n-1   : 0]   enemy_is_drawing;       // 1 if enemy drawing
+    wire    [enemy_n-1   : 0]   enemy_load;             // 
     // signals for enemy bouncing off left/right borders  
-    wire    [0         : 0]     enemy_hit_left      [enemy_n-1 : 0];    // 
-    wire    [0         : 0]     enemy_hit_right     [enemy_n-1 : 0];    // 
-    wire    [0         : 0]     enemy_hit_edge      [enemy_n-1 : 0];    // 
+    wire    [enemy_n-1   : 0]   enemy_hit_left;         // 
+    wire    [enemy_n-1   : 0]   enemy_hit_right;        // 
+    wire    [enemy_n-1   : 0]   enemy_hit_edge;         // 
     // player collides with enemy or track 
-    reg     [0         : 0]     frame_collision;    // 
+    reg     [0           : 0]   frame_collision;        // 
     // track graphics signals
-    wire    [0         : 0]     track_gfx;          //
-    wire    [0         : 0]     track_offside;      //
-    wire    [0         : 0]     track_shoulder;     //
+    wire    [0           : 0]   track_gfx;              //
+    wire    [0           : 0]   track_offside;          //
+    wire    [0           : 0]   track_shoulder;         //
     // for updating frame with negedge vsync
-    reg     [0         : 0]     frame_update;       //
-    reg     [0         : 0]     frame_update_last;  //
+    reg     [0           : 0]   frame_update;           //
+    reg     [0           : 0]   frame_update_last;      //
     // wire up car sprite ROM
     // multiplex between player and enemy ROM address
-    wire    [3         : 0]     player_sprite_yofs; //
-    wire    [3         : 0]     enemy_sprite_yofs   [enemy_n-1 : 0];  //
-    wire    [3         : 0]     enemy_sprite_yofs_f;
-    wire    [3         : 0]     car_sprite_yofs;    //
-    wire    [7         : 0]     car_sprite_bits;    //
+    wire    [3           : 0]   player_sprite_yofs;     //
+    wire    [4*enemy_n-1 : 0]   enemy_sprite_yofs;      //
+    reg     [3           : 0]   enemy_sprite_yofs_f;
+    wire    [3           : 0]   car_sprite_yofs;        //
+    wire    [7           : 0]   car_sprite_bits;        //
     /*******************************************************
     *                      ASSIGNMENT                      *
     *******************************************************/
     // car side
-    assign car_sprite_yofs = player_load ? player_sprite_yofs : (enemy_load[0] ?    enemy_sprite_yofs[0] : 
-                                                                (enemy_load[1] ?    enemy_sprite_yofs[1] : 
-                                                                (enemy_load[2] ?    enemy_sprite_yofs[2] : 
-                                                                (enemy_load[3] ?    enemy_sprite_yofs[3] : 
-                                                                                    0                              
-                                                                )))); 
+    assign car_sprite_yofs = player_load ? player_sprite_yofs : enemy_sprite_yofs_f; 
+
     // player side
     assign player_y        = 16'd454;
-    assign player_load     = ( hpos >= 696 ) && ( hpos < 700 );
+    assign player_load     = ( hpos >= 650 ) && ( hpos < 654 );
     assign player_vstart   = player_y == vpos;
     assign player_hstart   = player_x == hpos;
     // creating track's
@@ -90,7 +85,7 @@ module racing_game_top_v3
     assign track_gfx       = ( vpos [5 : 1] != track_pos[5 : 1] ) && track_offside;
     // form RGB signal
     assign  rgb =   {
-                        display_on && ( | enemy_gfx_f                ),
+                        display_on && ( | enemy_gfx                  ),
                         display_on && ( player_gfx || track_gfx      ),
                         display_on && ( player_gfx || track_shoulder )
                     };
@@ -98,6 +93,18 @@ module racing_game_top_v3
     /*******************************************************
     *               OTHER COMB AND SEQ LOGIC               *
     *******************************************************/
+    //
+    always @*
+    case( enemy_load )
+        7'b0000001 : enemy_sprite_yofs_f = enemy_sprite_yofs[0  +: 4];
+        7'b0000010 : enemy_sprite_yofs_f = enemy_sprite_yofs[4  +: 4];
+        7'b0000100 : enemy_sprite_yofs_f = enemy_sprite_yofs[8  +: 4];
+        7'b0001000 : enemy_sprite_yofs_f = enemy_sprite_yofs[12 +: 4];
+        7'b0010000 : enemy_sprite_yofs_f = enemy_sprite_yofs[16 +: 4];
+        7'b0100000 : enemy_sprite_yofs_f = enemy_sprite_yofs[20 +: 4];
+        7'b1000000 : enemy_sprite_yofs_f = enemy_sprite_yofs[24 +: 4];
+        default    : enemy_sprite_yofs_f = enemy_sprite_yofs[0  +: 4];
+    endcase
     // setting frame update
     always @(posedge clk, posedge reset)
         if( reset )
@@ -115,7 +122,6 @@ module racing_game_top_v3
             if( ( ! vsync ) && ( ! frame_update_last ) )
                 frame_update <= 1'b1;
         end
-    
     // changed speed
     always @(posedge clk, posedge reset)
         if( reset )
@@ -153,7 +159,7 @@ module racing_game_top_v3
             frame_collision <= 0;
         else
         begin
-            if( player_gfx && ( ( | enemy_gfx_f ) || track_gfx ) )
+            if( player_gfx && ( ( | enemy_gfx ) || track_gfx ) )
                 frame_collision <= 1;
             else if( frame_update )
                 frame_collision <= 0;
@@ -200,13 +206,12 @@ module racing_game_top_v3
     generate
         for( enemy_gen = 0; enemy_gen < enemy_n ; enemy_gen = enemy_gen + 1 )
         begin : generate_enemys
-            assign enemy_load[enemy_gen]        = ( hpos >= ( 700 + enemy_gen * 4 ) ) && ( hpos < ( 700 + ( enemy_gen + 1 ) * 4 ) );
+            assign enemy_load[enemy_gen]        = ( hpos >= ( 660 + enemy_gen * 6 ) ) && ( hpos < ( 660 + ( enemy_gen + 1 ) * 6 - 2 ) );
             assign enemy_vstart[enemy_gen]      = enemy_y[enemy_gen] == vpos;
             assign enemy_hstart[enemy_gen]      = enemy_x[enemy_gen] == hpos;
             assign enemy_hit_left[enemy_gen]    = ( enemy_x[enemy_gen] == 52 ); 
             assign enemy_hit_right[enemy_gen]   = ( enemy_x[enemy_gen] == 580 );
             assign enemy_hit_edge[enemy_gen]    = enemy_hit_left[enemy_gen] || enemy_hit_right[enemy_gen];
-            assign enemy_gfx_f[enemy_gen]       = enemy_gfx[enemy_gen];
             // edit enemy position
             always @(posedge clk, posedge reset)
                 if( reset )
@@ -232,15 +237,15 @@ module racing_game_top_v3
             sprite_renderer 
             enemy_renderer
             (
-                .clk            ( clk                           ),
-                .reset          ( reset                         ),
-                .vstart         ( enemy_vstart      [enemy_gen] ),
-                .load           ( enemy_load        [enemy_gen] ),
-                .hstart         ( enemy_hstart      [enemy_gen] ),
-                .rom_addr       ( enemy_sprite_yofs [enemy_gen] ),
-                .rom_bits       ( car_sprite_bits               ),
-                .gfx            ( enemy_gfx         [enemy_gen] ),
-                .in_progress    ( enemy_is_drawing  [enemy_gen] )
+                .clk            ( clk                                       ),
+                .reset          ( reset                                     ),
+                .vstart         ( enemy_vstart      [enemy_gen     +: 1]    ),
+                .load           ( enemy_load        [enemy_gen     +: 1]    ),
+                .hstart         ( enemy_hstart      [enemy_gen     +: 1]    ),
+                .rom_addr       ( enemy_sprite_yofs [enemy_gen * 4 +: 4]    ),
+                .rom_bits       ( car_sprite_bits                           ),
+                .gfx            ( enemy_gfx         [enemy_gen     +: 1]    ),
+                .in_progress    ( enemy_is_drawing  [enemy_gen     +: 1]    )
             );
         end
     endgenerate
@@ -262,6 +267,18 @@ module racing_game_top_v3
         enemy_y_init[3] = 16'd100;
         enemy_x_init[3] = 16'd200;
         enemy_dir_init[3] = 1'b1;
+
+        enemy_y_init[4] = 16'd150;
+        enemy_x_init[4] = 16'd200;
+        enemy_dir_init[4] = 1'b0;
+
+        enemy_y_init[5] = 16'd180;
+        enemy_x_init[5] = 16'd220;
+        enemy_dir_init[5] = 1'b1;
+
+        enemy_y_init[6] = 16'd200;
+        enemy_x_init[6] = 16'd200;
+        enemy_dir_init[6] = 1'b1;
     end
 
 endmodule // racing_game_top_v3
