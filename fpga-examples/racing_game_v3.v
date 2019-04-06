@@ -260,25 +260,25 @@ module racing_game_top_v3
         enemy_x_init[1] = 16'd320;
         enemy_dir_init[1] = 1'b1;
 
-        enemy_y_init[2] = 16'd0;
-        enemy_x_init[2] = 16'd100;
-        enemy_dir_init[2] = 1'b1;
+        enemy_y_init[2] = 16'd150;
+        enemy_x_init[2] = 16'd150;
+        enemy_dir_init[2] = 1'b0;
 
-        enemy_y_init[3] = 16'd100;
-        enemy_x_init[3] = 16'd200;
+        enemy_y_init[3] = 16'd130;
+        enemy_x_init[3] = 16'd250;
         enemy_dir_init[3] = 1'b1;
 
         enemy_y_init[4] = 16'd150;
-        enemy_x_init[4] = 16'd200;
+        enemy_x_init[4] = 16'd500;
         enemy_dir_init[4] = 1'b0;
 
-        enemy_y_init[5] = 16'd180;
-        enemy_x_init[5] = 16'd220;
+        enemy_y_init[5] = 16'd200;
+        enemy_x_init[5] = 16'd400;
         enemy_dir_init[5] = 1'b1;
 
-        enemy_y_init[6] = 16'd200;
+        enemy_y_init[6] = 16'd250;
         enemy_x_init[6] = 16'd200;
-        enemy_dir_init[6] = 1'b1;
+        enemy_dir_init[6] = 1'b0;
     end
 
 endmodule // racing_game_top_v3

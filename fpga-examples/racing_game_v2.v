@@ -146,9 +146,9 @@ module racing_game_top_v2
             if( enemy_hit_edge_0 )
                 enemy_dir_0 <= ~ enemy_dir_0;
             if( enemy_dir_0 ^ enemy_hit_edge_0 )
-                enemy_x_0 <= enemy_x_0 + 4;
+                enemy_x_0 <= enemy_x_0 + 1;
             else
-                enemy_x_0 <= enemy_x_0 - 4;
+                enemy_x_0 <= enemy_x_0 - 1;
         end
     // edit enemy position
     always @(posedge clk, posedge reset)
@@ -166,9 +166,9 @@ module racing_game_top_v2
             if( enemy_hit_edge_1 )
                 enemy_dir_1 <= ~ enemy_dir_1;
             if( enemy_dir_1 ^ enemy_hit_edge_1 )
-                enemy_x_1 <= enemy_x_1 + 4;
+                enemy_x_1 <= enemy_x_1 + 1;
             else
-                enemy_x_1 <= enemy_x_1 - 4;
+                enemy_x_1 <= enemy_x_1 - 1;
         end
     // changed speed
     always @(posedge clk, posedge reset)

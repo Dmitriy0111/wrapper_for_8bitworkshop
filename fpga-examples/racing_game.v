@@ -124,9 +124,9 @@ module racing_game_top
             if( enemy_hit_edge )
                 enemy_dir <= ~ enemy_dir;
             if( enemy_dir ^ enemy_hit_edge )
-                enemy_x <= enemy_x + 4;
+                enemy_x <= enemy_x + 1;
             else
-                enemy_x <= enemy_x - 4;
+                enemy_x <= enemy_x - 1;
         end
     // changed speed
     always @(posedge clk, posedge reset)

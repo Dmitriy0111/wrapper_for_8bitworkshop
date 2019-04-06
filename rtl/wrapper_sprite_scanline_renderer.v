@@ -10,9 +10,6 @@ module wrapper_sprite_scanline_renderer
 
     reg     [0 : 0]     clk_div;
 
-    assign left  = keys[0];
-    assign right = keys[1];
-
     always @(posedge clk, posedge reset)
         if( reset )
             clk_div <= 1'b0;

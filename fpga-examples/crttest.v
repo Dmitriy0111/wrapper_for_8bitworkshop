@@ -13,6 +13,7 @@ module crttest
     wire    [15 : 0]    hpos;
     wire    [15 : 0]    vpos;
     reg     [5  : 0]    frame;
+    wire    [0  : 0]    display_on;
 
     reg     [0  : 0]    frame_update;
     reg     [0  : 0]    last_frame_update;
