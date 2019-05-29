@@ -70,6 +70,18 @@ set_global_assignment -name VERILOG_FILE ../../fpga-examples/cpu8.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/racing_game_cpu.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/sprite_rotation.v
 set_global_assignment -name VERILOG_FILE ../../fpga-examples/sprite_scanline_renderer.v
+
+set_global_assignment -name VERILOG_FILE ../../schoolMIPS-01_mmio/src/sm_als.v
+set_global_assignment -name VERILOG_FILE ../../schoolMIPS-01_mmio/src/sm_cpu.v
+set_global_assignment -name VERILOG_FILE ../../schoolMIPS-01_mmio/src/sm_gpio.v
+set_global_assignment -name VERILOG_FILE ../../schoolMIPS-01_mmio/src/sm_hex_display.v
+set_global_assignment -name VERILOG_FILE ../../schoolMIPS-01_mmio/src/sm_matrix.v
+set_global_assignment -name VERILOG_FILE ../../schoolMIPS-01_mmio/src/sm_pwm.v
+set_global_assignment -name VERILOG_FILE ../../schoolMIPS-01_mmio/src/sm_ram.v
+set_global_assignment -name VERILOG_FILE ../../schoolMIPS-01_mmio/src/sm_register.v
+set_global_assignment -name VERILOG_FILE ../../schoolMIPS-01_mmio/src/sm_rom.v
+set_global_assignment -name VERILOG_FILE ../../schoolMIPS-01_mmio/src/sm_top.v
+
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0

@@ -25,7 +25,7 @@ module rz_easyFPGA_A2_1
     assign dig = '1;
     assign hex0 = '1;
 
-`define FPGA_EXAMPLE wrapper_racing_game_v3
+`define FPGA_EXAMPLE wrapper_racing_game_cpu
 
     `FPGA_EXAMPLE
     `FPGA_EXAMPLE

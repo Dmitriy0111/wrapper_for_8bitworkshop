@@ -3,7 +3,7 @@ vlib work
 
 #set test "test_hvsync_tb"
 #set test "racing_game_tb"
-#set test "racing_game_cpu_tb"
+set test "racing_game_cpu_tb"
 #set test "spritetest_tb"
 #set test "digits10_tb"
 #set test "starfield_tb"
@@ -12,7 +12,7 @@ vlib work
 #set test "ball_paddle_tb"
 #set test "sprite_rotation_tb"
 #set test "racing_game_v2_tb"
-set test "racing_game_v3_tb"
+#set test "racing_game_v3_tb"
 #set test "sprite_scanline_renderer_tb"
 
 if {$test == "test_hvsync_tb"} {
@@ -90,22 +90,31 @@ if {$test == "test_hvsync_tb"} {
 
     set i0 +incdir+../fpga-examples
     set i1 +incdir+../rtl
-    set i2 +incdir+../tb
+    set i2 +incdir+../schoolMIPS-01_mmio/src
+    set i3 +incdir+../tb
 
     set s0 ../fpga-examples/hvsync_generator.v
     set s1 ../fpga-examples/sprite_bitmap.v
     set s2 ../fpga-examples/sprite_renderer.v
     set s3 ../fpga-examples/racing_game_cpu.v
-    set s4 ../fpga-examples/cpu8.v
+    set s4 ../schoolMIPS-01_mmio/src/*.*v
     set s5 ../rtl/wrapper_racing_game_cpu.v
+
     set s6 ../tb/racing_game_cpu_tb.*v
 
-    vlog $i0 $i1 $i2 $s0 $s1 $s2 $s3 $s4 $s5 $s6
+    vlog $i0 $i1 $i2 $i3 $s0 $s1 $s2 $s3 $s4 $s5 $s6
 
     vsim -novopt work.racing_game_cpu_tb
+    add wave -divider  "testbench signals"
     add wave -position insertpoint sim:/racing_game_cpu_tb/*
-    add wave -position insertpoint sim:/racing_game_cpu_tb/wrapper_racing_game_cpu_0/racing_game_cpu_top_0/*
-    add wave -position insertpoint sim:/racing_game_cpu_tb/wrapper_racing_game_cpu_0/racing_game_cpu_top_0/cpu/*
+    add wave -divider  "sm_top signals"
+    add wave -position insertpoint sim:/racing_game_cpu_tb/wrapper_racing_game_cpu_0/sm_top_0/*
+    add wave -divider  "sm_cpu signals"
+    add wave -position insertpoint sim:/racing_game_cpu_tb/wrapper_racing_game_cpu_0/sm_top_0/sm_cpu/*
+    add wave -divider  "sm_matrix signals"
+    add wave -position insertpoint sim:/racing_game_cpu_tb/wrapper_racing_game_cpu_0/sm_top_0/matrix/*
+    add wave -divider  "racing game cpu signals"
+    add wave -position insertpoint sim:/wrapper_racing_game_cpu_0/sm_top_0/matrix/racing_game_cpu_top_0/*
 
 } elseif {$test == "digits10_tb"} {
 

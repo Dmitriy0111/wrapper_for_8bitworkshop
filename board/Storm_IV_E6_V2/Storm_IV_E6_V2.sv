@@ -21,7 +21,7 @@ module Storm_IV_E6_V2
     assign {r,g,b} = { rgb[2] , rgb[1] , rgb[0] };
     assign led = '0;
 
-`define FPGA_EXAMPLE wrapper_racing_game_v3
+`define FPGA_EXAMPLE wrapper_racing_game_cpu
 
     `FPGA_EXAMPLE
     `FPGA_EXAMPLE

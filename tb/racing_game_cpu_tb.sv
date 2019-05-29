@@ -32,15 +32,22 @@ module racing_game_cpu_tb ();
 
     initial
     begin
+        integer i;
+        for(i=0;i<32;i++)
+            wrapper_racing_game_cpu_0.sm_top_0.sm_cpu.rf.rf[i] = '0;
+    end
+
+    initial
+    begin
         clk = '0;
         forever
             #(T / 2) clk = ~ clk;
     end
     initial
     begin
-        reset = '1;
-        repeat(rst_delay) @(posedge clk);
         reset = '0;
+        repeat(rst_delay) @(posedge clk);
+        reset = '1;
     end
     initial
     begin
@@ -49,8 +56,9 @@ module racing_game_cpu_tb ();
     end
     initial
     begin
-        $readmemb("../fpga-examples/car.hex",wrapper_racing_game_cpu_0.racing_game_cpu_top_0.car.bitarray);
-        $readmemh("../fpga-examples/racing.hex",wrapper_racing_game_cpu_0.racing_game_cpu_top_0.rom);
+        $readmemb("../fpga-examples/car.hex",wrapper_racing_game_cpu_0.sm_top_0.matrix.racing_game_cpu_top_0.car.bitarray);
+        $readmemb("../program-file/program.hex",wrapper_racing_game_cpu_0.sm_top_0.reset_rom.rom);
+        //$readmemh("../fpga-examples/racing.hex",wrapper_racing_game_cpu_0.racing_game_cpu_top_0.rom);
     end
 
     `ifdef log_en

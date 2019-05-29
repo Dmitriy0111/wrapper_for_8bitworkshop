@@ -22,8 +22,8 @@ RUN_DIR  = $(PWD)/run
 RTL_DIR  = $(PWD)/rtl
 TB_DIR   = $(PWD)/tb
 
-BOARDS_SUPPORTED ?= de10_lite
-BOARD            ?= de10_lite
+BOARDS_SUPPORTED ?= de10_lite rz_easyFPGA_A2_1 Storm_IV_E6_V2
+BOARD            ?= rz_easyFPGA_A2_1
 
 ########################################################
 # common make targets
@@ -33,7 +33,8 @@ show_pwd:
 
 clean: \
 	sim_clean \
-	board_clean
+	board_clean \
+	prog_clean
 
 sim_all: \
 	sim_cmd 
@@ -101,6 +102,9 @@ synth_gui_q:
 
 synth_load_q:
 	quartus_pgm -c $(CABLE_NAME) -m JTAG -o "p;synth_$(BOARD)/$(BOARD).sof"
+
+prog_clean:
+	rm -rfd program_file
 
 ########################################################
 # synthesis - all the supported boards

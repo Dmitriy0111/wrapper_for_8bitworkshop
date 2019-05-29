@@ -1,26 +1,35 @@
 
 module racing_game_cpu_top
 (
-    input   wire    [0 : 0]     clk,        // clock
-    input   wire    [0 : 0]     reset,      // reset
-    input   wire    [0 : 0]     left,
-    input   wire    [0 : 0]     right,
-    output  wire    [0 : 0]     hsync,      // horizontal sync
-    output  wire    [0 : 0]     vsync,      // vertical sync
-    output  wire    [2 : 0]     rgb         // RGB   
+    // clock and reset
+    input   wire    [0  : 0]    clk,        // clock
+    input   wire    [0  : 0]    reset,      // reset
+    // cpu side
+    input   wire    [0  : 0]    bSel,       // select
+    input   wire    [31 : 0]    bAddr,      // address
+    input   wire    [0  : 0]    bWrite,     // write enable
+    input   wire    [31 : 0]    bWData,     // write data
+    output  reg     [31 : 0]    bRData,     // read data
+    // game side
+    input   wire    [0  : 0]    left,       // left key
+    input   wire    [0  : 0]    right,      // right key
+    output  wire    [0  : 0]    hsync,      // horizontal sync
+    output  wire    [0  : 0]    vsync,      // vertical sync
+    output  wire    [2  : 0]    rgb         // RGB   
 );
+
     /*******************************************************
     *                 PARAMS & LOCALPARAMS                 *
     *******************************************************/
-    localparam  PLAYER_X    = 2,        // player X coordinate
-                PLAYER_Y    = 3,        // player Y coordinate
-                ENEMY_X     = 4,        // enemy X coordinate
-                ENEMY_Y     = 5,        // enemy Y coordinate
-                ENEMY_DIR   = 6,        // enemy direction (1, -1)
-                SPEED       = 7,        // player speed
-                TRACKPOS_LO = 8,	    // track position (lo byte)
-                TRACKPOS_HI = 9,	    // track position (hi byte)
-                IN_FLAGS    = 8'h42;    // flags: [0, 0, collision, vsync, hsync, vpaddle, hpaddle, display_on]
+    localparam  PLAYER_X_A      = 6'h00,    // player X coordinate
+                PLAYER_Y_A      = 6'h04,    // player Y coordinate
+                ENEMY_X_A       = 6'h08,    // enemy X coordinate
+                ENEMY_Y_A       = 6'h0c,    // enemy Y coordinate
+                ENEMY_DIR_A     = 6'h10,    // enemy direction (1, -1)
+                SPEED_A         = 6'h14,    // player speed
+                TRACKPOS_LO_A   = 6'h18,    // track position (lo byte)
+                TRACKPOS_HI_A   = 6'h1c,    // track position (hi byte)
+                IN_FLAGS_A      = 6'h20;    // flags: [0, 0, collision, vsync, hsync, vpaddle, hpaddle, display_on]
     /*******************************************************
     *               WIRE AND REG DECLARATION               *
     *******************************************************/
@@ -30,13 +39,6 @@ module racing_game_cpu_top
     wire    [15 : 0]    vpos;
     reg     [0  : 0]    frame_update;
     reg     [0  : 0]    frame_update_last;
-    // ROM memory for CPU
-    reg     [7  : 0]    rom [0 : 127];  // 128 bytes of ROM
-    // CPU control and data wires
-    wire    [7  : 0]    address_bus;	// CPU address bus
-    reg     [7  : 0]    to_cpu;		    // data bus to CPU
-    wire    [7  : 0]    from_cpu;		// data bus from CPU
-    wire    [0  : 0]    write_enable;   // write enable bit from CPU
     // track variables
     reg     [7  : 0]    track_pos_lo;
     reg     [7  : 0]    track_pos_hi;
@@ -53,8 +55,8 @@ module racing_game_cpu_top
     wire    [0  : 0]    player_gfx;
     wire    [0  : 0]    player_is_drawing;
     // enemy variables
-    reg     [7  : 0]    enemy_x;
-    reg     [7  : 0]    enemy_y;
+    reg     [15 : 0]    enemy_x;
+    reg     [15 : 0]    enemy_y;
     reg     [7  : 0]    enemy_dir;
     wire    [0  : 0]    enemy_vstart;
     wire    [0  : 0]    enemy_hstart;
@@ -153,68 +155,59 @@ module racing_game_cpu_top
     always @(posedge clk, posedge reset)
         if( reset )
             enemy_x <= 0;
-        else if(write_enable && ( address_bus[5 : 0] == ENEMY_X ))
-            enemy_x <= from_cpu;
+        else if( bWrite && ( bAddr[5 : 0] == ENEMY_X_A ) && bSel )
+            enemy_x <= bWData;
     // enemy_y write
     always @(posedge clk, posedge reset)
         if( reset )
             enemy_y <= 0;
-        else if(write_enable && ( address_bus[5 : 0] == ENEMY_Y ))
-            enemy_y <= from_cpu;
+        else if( bWrite && ( bAddr[5 : 0] == ENEMY_Y_A ) && bSel )
+            enemy_y <= bWData;
     // speed write
     always @(posedge clk, posedge reset)
         if( reset )
             speed <= 8'hf;
-        else if(write_enable && ( address_bus[5 : 0] == SPEED ))
-            speed <= from_cpu;
+        else if( bWrite && ( bAddr[5 : 0] == SPEED_A ) && bSel )
+            speed <= bWData;
     // enemy_dir write
     always @(posedge clk, posedge reset)
         if( reset )
             enemy_dir <= 0;
-        else if(write_enable && ( address_bus[5 : 0] == ENEMY_DIR ))
-            enemy_dir <= from_cpu;
+        else if( bWrite && ( bAddr[5 : 0] == ENEMY_DIR_A ) && bSel )
+            enemy_dir <= bWData;
     // track_pos_lo write
     always @(posedge clk, posedge reset)
         if( reset )
             track_pos_lo <= 0;
-        else if(write_enable && ( address_bus[5 : 0] == TRACKPOS_LO ))
-            track_pos_lo <= from_cpu;
+        else if( bWrite && ( bAddr[5 : 0] == TRACKPOS_LO_A ) && bSel )
+            track_pos_lo <= bWData;
     // track_pos_hi write
     always @(posedge clk, posedge reset)
         if( reset )
             track_pos_hi <= 0;
-        else if(write_enable && ( address_bus[5 : 0] == TRACKPOS_HI ))
-            track_pos_hi <= from_cpu;
+        else if( bWrite && ( bAddr[5 : 0] == TRACKPOS_HI_A ) && bSel )
+            track_pos_hi <= bWData;
     // reading data(player, enemy, track, flags, program)
     always @(*)
-        casex (address_bus)
-            { 2'b00 , PLAYER_X    } :   to_cpu = player_x[8 +: 8];
-            { 2'b00 , PLAYER_Y    } :   to_cpu = player_y[8 +: 8];
-            { 2'b00 , ENEMY_X     } :   to_cpu = enemy_x;
-            { 2'b00 , ENEMY_Y     } :   to_cpu = enemy_y;
-            { 2'b00 , ENEMY_DIR   } :   to_cpu = enemy_dir;
-            { 2'b00 , SPEED       } :   to_cpu = speed;
-            { 2'b00 , TRACKPOS_LO } :   to_cpu = track_pos_lo;
-            { 2'b00 , TRACKPOS_HI } :   to_cpu = track_pos_hi;
+    begin
+        bRData = 32'h0000_0000;
+        casex( bAddr[5 : 0] )
+            PLAYER_X_A      :   bRData = player_x;
+            PLAYER_Y_A      :   bRData = player_y;
+            ENEMY_X_A       :   bRData = enemy_x;
+            ENEMY_Y_A       :   bRData = enemy_y;
+            ENEMY_DIR_A     :   bRData = enemy_dir;
+            SPEED_A         :   bRData = speed;
+            TRACKPOS_LO_A   :   bRData = track_pos_lo;
+            TRACKPOS_HI_A   :   bRData = track_pos_hi;
             // special read registers
-            IN_FLAGS                :   to_cpu = flags_reg;
-            // ROM
-            8'b1???????             :   to_cpu = rom[address_bus[6 : 0]];
-            default                 :   to_cpu = 8'b00000000;
+            IN_FLAGS_A      :   bRData = flags_reg;
+            default         :   bRData = 8'b00000000;
         endcase
+    end
     /*******************************************************
     *                   MODULE INSTANCES                   *
     *******************************************************/
-    // creating one 8-bit CPU module
-    CPU 
-    cpu
-    (   .clk            ( clk                   ),
-        .reset          ( reset                 ),
-        .address        ( address_bus           ),
-        .data_in        ( to_cpu                ),
-        .data_out       ( from_cpu              ),
-        .write          ( write_enable          )
-    );
     // creating one video sync generator
     hvsync_generator 
     hvsync_gen
@@ -262,9 +255,5 @@ module racing_game_cpu_top
         .gfx            ( enemy_gfx             ),
         .in_progress    ( enemy_is_drawing      )
     );
-    
-    // CPU program code
-    initial
-        $readmemh("../../fpga-examples/racing.hex", rom);
   
 endmodule // racing_game_cpu_top
