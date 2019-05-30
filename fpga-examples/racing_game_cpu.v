@@ -25,11 +25,10 @@ module racing_game_cpu_top
                 PLAYER_Y_A      = 6'h04,    // player Y coordinate
                 ENEMY_X_A       = 6'h08,    // enemy X coordinate
                 ENEMY_Y_A       = 6'h0c,    // enemy Y coordinate
-                ENEMY_DIR_A     = 6'h10,    // enemy direction (1, -1)
+                ENEMY_DIR_A     = 6'h10,    // enemy direction (left - 0, right - 1)
                 SPEED_A         = 6'h14,    // player speed
-                TRACKPOS_LO_A   = 6'h18,    // track position (lo byte)
-                TRACKPOS_HI_A   = 6'h1c,    // track position (hi byte)
-                IN_FLAGS_A      = 6'h20;    // flags: [0, 0, collision, vsync, hsync, vpaddle, hpaddle, display_on]
+                TRACKPOS_A      = 6'h18,    // track position
+                IN_FLAGS_A      = 6'h1C;    // flags: [0, 0, collision, vsync, hsync, 0, 0, display_on]
     /*******************************************************
     *               WIRE AND REG DECLARATION               *
     *******************************************************/
@@ -40,8 +39,7 @@ module racing_game_cpu_top
     reg     [0  : 0]    frame_update;
     reg     [0  : 0]    frame_update_last;
     // track variables
-    reg     [7  : 0]    track_pos_lo;
-    reg     [7  : 0]    track_pos_hi;
+    reg     [15 : 0]    track_pos;
     wire    [0  : 0]    track_offside;
     wire    [0  : 0]    track_shoulder;
     wire    [0  : 0]    track_gfx;
@@ -57,7 +55,7 @@ module racing_game_cpu_top
     // enemy variables
     reg     [15 : 0]    enemy_x;
     reg     [15 : 0]    enemy_y;
-    reg     [7  : 0]    enemy_dir;
+    reg     [0  : 0]    enemy_dir;
     wire    [0  : 0]    enemy_vstart;
     wire    [0  : 0]    enemy_hstart;
     wire    [0  : 0]    enemy_gfx;
@@ -94,7 +92,7 @@ module racing_game_cpu_top
     // track graphics
     assign track_offside    = ( hpos < 20 ) || ( hpos > 620 );
     assign track_shoulder   = ( hpos < 40 ) || ( hpos > 600 );
-    assign track_gfx        = ( vpos [5 : 1] != track_pos_lo[5 : 1] ) && track_offside;
+    assign track_gfx        = ( vpos [5 : 1] != track_pos[5 : 1] ) && track_offside;
     //flags register
     assign flags_reg        =   {  
                                     2'b0, 
@@ -175,19 +173,13 @@ module racing_game_cpu_top
             enemy_dir <= 0;
         else if( bWrite && ( bAddr[5 : 0] == ENEMY_DIR_A ) && bSel )
             enemy_dir <= bWData;
-    // track_pos_lo write
+    // track_pos write
     always @(posedge clk, posedge reset)
         if( reset )
-            track_pos_lo <= 0;
-        else if( bWrite && ( bAddr[5 : 0] == TRACKPOS_LO_A ) && bSel )
-            track_pos_lo <= bWData;
-    // track_pos_hi write
-    always @(posedge clk, posedge reset)
-        if( reset )
-            track_pos_hi <= 0;
-        else if( bWrite && ( bAddr[5 : 0] == TRACKPOS_HI_A ) && bSel )
-            track_pos_hi <= bWData;
-    // reading data(player, enemy, track, flags, program)
+            track_pos <= 0;
+        else if( bWrite && ( bAddr[5 : 0] == TRACKPOS_A ) && bSel )
+            track_pos <= bWData;
+    // reading data(player, enemy, track, flags)
     always @(*)
     begin
         bRData = 32'h0000_0000;
@@ -198,8 +190,7 @@ module racing_game_cpu_top
             ENEMY_Y_A       :   bRData = enemy_y;
             ENEMY_DIR_A     :   bRData = enemy_dir;
             SPEED_A         :   bRData = speed;
-            TRACKPOS_LO_A   :   bRData = track_pos_lo;
-            TRACKPOS_HI_A   :   bRData = track_pos_hi;
+            TRACKPOS_A      :   bRData = track_pos;
             // special read registers
             IN_FLAGS_A      :   bRData = flags_reg;
             default         :   bRData = 8'b00000000;

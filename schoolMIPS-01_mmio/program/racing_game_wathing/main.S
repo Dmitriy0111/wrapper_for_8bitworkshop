@@ -47,8 +47,6 @@ init:       move    $t0, $0
             # init enemy_y
             move    $t3, $0                 # set enemy_y position to center 0
             sw      $t3, ENEMY_Y ($t2)      # set enemy_y position to center 0
-            # init enemy dir
-            sw      $t3, ENEMY_DIR ($t2)    # set enemy direction to left (0)
             # wait for vsync = 0
 wait_vs_0:  lw      $t1, FLAGS ($t2)        # get flags register
             andi    $t1, $t1, VSYNC_F       # find vsync flag
@@ -56,7 +54,7 @@ wait_vs_0:  lw      $t1, FLAGS ($t2)        # get flags register
 
             # check frame collision
             lw      $t1, FLAGS ($t2)        # load flags register
-            andi    $t1, $t1, COLLISION_F   # mask
+            andi    $t1, $t1, COLLISION_F   # find collision flag
             lw      $t5, SPEED ($t2)        # get old speed
             beq     $t1, $0,  ch_fc         # check frame collision
             addiu   $t5, $0,  MIN_SPEED     # set default speed
@@ -77,19 +75,17 @@ new_speed:  sw      $t5, SPEED ($t2)        # set new speed
 st_enemy_y: sw      $t3, ENEMY_Y ($t2)      # set new enemy_y position
 
             # edit enemy_x position
-            lw      $t3, ENEMY_DIR ($t2)    # get old enemy dir value
-            lw      $t4, ENEMY_X ($t2)      # get old enemy_x position
-            beq     $t3, $0,  left          # go to left or right logic
-right:      addiu   $t4, $t4, ENEMY_STEP    # inc enemy_x position
-            addiu   $t3, $0,  STOP_RV       # load stop right value
-            sltu    $t3, $t4, $t3           # stop right value < current enemy_x position ?
-            beq     $0,  $0,  st_enemy_x    # go to set new enemy position
-left:       addiu   $t3, $t3, ENEMY_STEP    # load step value
-            subu    $t4, $t4, $t3           # substruction enemy_x position with step value
-            addiu   $t3, $0,  STOP_LV       # load stop left value
-            sltu    $t3, $t4, $t3           # stop left value < current enemy_x position ?
-st_enemy_x: sw      $t4, ENEMY_X ($t2)      # set new enemy_x position
-            sw      $t3, ENEMY_DIR ($t2)    # set new enemy dir value
+            lw      $t3, ENEMY_X ($t2)      # get old enemy_x position
+            lw      $t4, PLAYER_X ($t2)     # get player_x position
+            beq     $t3, $t4, st_enemy_x    # if player_x position = enemy_x position -> go to set new enemy value
+            sltu    $t4, $t3, $t4           # enemy_x position < player_x position?
+            beq     $t4, $t0, left          # go to left
+right:      addiu   $t4, $t4, ENEMY_STEP    # load enemy step value
+            addu    $t3, $t3, $t4           # increment enemy_x position
+            beq     $0,  $0,  st_enemy_x    # go to set new enemy_x position
+left:       addiu   $t4, $t4, ENEMY_STEP    # load enemy step value
+            subu    $t3, $t3, $t4           # decrement enemy_x position
+st_enemy_x: sw      $t3, ENEMY_X ($t2)      # set new enemy_x position
 
             # edit track position
             lw      $t3, TRACKPOS ($t2)     # get old track position

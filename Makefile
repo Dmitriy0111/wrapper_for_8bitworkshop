@@ -103,6 +103,15 @@ synth_gui_q:
 synth_load_q:
 	quartus_pgm -c $(CABLE_NAME) -m JTAG -o "p;synth_$(BOARD)/$(BOARD).sof"
 
+########################################################
+# program compile
+
+PROG_NAME ?= racing_game_simple
+
+prog_comp:
+	mkdir -p schoolMIPS-01_mmio/program_file
+	java -jar schoolMIPS-01_mmio/scripts/bin/Mars4_5.jar nc a dump .text HexText schoolMIPS-01_mmio/program_file/program.hex schoolMIPS-01_mmio/program/$(PROG_NAME)/main.S
+
 prog_clean:
 	rm -rfd program_file
 

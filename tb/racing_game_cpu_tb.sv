@@ -52,14 +52,15 @@ module racing_game_cpu_tb ();
     initial
     begin
         left    = 1'b0;
-        right   = 1'b1;
+        right   = 1'b0;
     end
     initial
     begin
         $readmemb("../fpga-examples/car.hex",wrapper_racing_game_cpu_0.sm_top_0.matrix.racing_game_cpu_top_0.car.bitarray);
-        $readmemb("../program-file/program.hex",wrapper_racing_game_cpu_0.sm_top_0.reset_rom.rom);
+        $readmemh("../schoolMIPS-01_mmio/program_file/program.hex",wrapper_racing_game_cpu_0.sm_top_0.reset_rom.rom);
         //$readmemh("../fpga-examples/racing.hex",wrapper_racing_game_cpu_0.racing_game_cpu_top_0.rom);
     end
+    //D:\DM\work\wrapper_for_8bitworkshop\wrapper_for_8bitworkshop-wrapper_for_8bitworkshop\schoolMIPS-01_mmio\program_file\program.hex
 
     `ifdef log_en
 
