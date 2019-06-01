@@ -27,7 +27,7 @@
 .eqv        STOP_VERT       0x1E0
 .eqv        STOP_RV         0x244
 .eqv        STOP_LV         0x34
-.eqv        SHIFT_SPD       0x02    # shift speed
+.eqv        SHIFT_SPD       0x04    # shift speed
 .eqv        ENEMY_STEP      0x01
 .eqv        SPEED_STEP      0x01
 

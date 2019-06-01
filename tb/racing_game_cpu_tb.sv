@@ -45,9 +45,9 @@ module racing_game_cpu_tb ();
     end
     initial
     begin
-        reset = '0;
-        repeat(rst_delay) @(posedge clk);
         reset = '1;
+        repeat(rst_delay) @(posedge clk);
+        reset = '0;
     end
     initial
     begin

@@ -18,7 +18,7 @@ module wrapper_racing_game_cpu
     sm_top_0
     (
         .clkIn          ( clk       ),
-        .rst_n          ( reset     ),
+        .rst_n          ( !reset    ),
         .clkDevide      ( 0         ),
         .clkEnable      ( 1'b1      ),
         .clk            (           ),
