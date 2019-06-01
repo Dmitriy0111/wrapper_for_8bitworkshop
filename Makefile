@@ -113,7 +113,7 @@ prog_comp:
 	java -jar schoolMIPS-01_mmio/scripts/bin/Mars4_5.jar nc a dump .text HexText schoolMIPS-01_mmio/program_file/program.hex schoolMIPS-01_mmio/program/$(PROG_NAME)/main.S
 
 prog_clean:
-	rm -rfd program_file
+	rm -rfd schoolMIPS-01_mmio/program_file
 
 ########################################################
 # synthesis - all the supported boards
